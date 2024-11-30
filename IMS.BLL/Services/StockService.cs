@@ -100,18 +100,23 @@ namespace IMS.BLL.Services
         }
 
         public async Task DeleteStockAsync(int id)
+{
+    try
+    {
+        var stock = await _stockRepository.GetStockByIdAsync(id);
+        if (stock == null)
         {
-            try
-            {
-                _logger.LogInformation($"Deleting stock with ID: {id} from repository");
-                await _stockRepository.DeleteStockAsync(id);
-                _logger.LogInformation($"Deleted stock with ID: {id} from repository");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in DeleteStockAsync: {ex.Message}");
-                throw;
-            }
+            _logger.LogWarning($"Stock with ID {id} not found in repository.");
+            return; // Ensure no further action is taken if stock is not found
         }
+        await _stockRepository.DeleteStockAsync(id);
+        _logger.LogInformation($"Deleted stock with ID: {id} from repository");
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error in DeleteStockAsync: {ex.Message}");
+        throw;
+    }
+}
     }
 }
