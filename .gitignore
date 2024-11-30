@@ -1,0 +1,21 @@
+# Ignore Visual Studio temporary files, build results, and user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build results
+bin/
+obj/
+
+# Ignore logs
+*.log
+
+# Ignore node_modules (for frontend like React)
+node_modules/
+dist/
+
+# Ignore Docker files
+docker-compose.override.yml
+.env
