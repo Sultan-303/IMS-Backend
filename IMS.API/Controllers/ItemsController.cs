@@ -45,7 +45,7 @@ namespace IMS.API.Controllers
                 var item = await _itemService.GetItemByIdAsync(id);
                 if (item == null)
                 {
-                    return NotFound($"Item with ID {id} not found.");
+                    return NotFound();
                 }
                 return Ok(item);
             }
@@ -59,6 +59,11 @@ namespace IMS.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddItem([FromBody] Item item)
         {
+            if (item == null)
+            {
+                return new BadRequestObjectResult("Item is null.");
+            }
+
             try
             {
                 _logger.LogInformation("Adding new item");
@@ -85,6 +90,11 @@ namespace IMS.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateItem(int id, [FromBody] Item item)
         {
+            if (item == null)
+            {
+                return BadRequest("Item cannot be null.");
+            }
+
             if (id != item.ItemID)
             {
                 return BadRequest("Item ID mismatch.");
@@ -93,6 +103,12 @@ namespace IMS.API.Controllers
             try
             {
                 _logger.LogInformation($"Updating item with ID: {id}");
+                var existingItem = await _itemService.GetItemByIdAsync(id);
+                if (existingItem == null)
+                {
+                    return NotFound();
+                }
+
                 await _itemService.UpdateItemAsync(item);
                 return NoContent();
             }
@@ -114,6 +130,11 @@ namespace IMS.API.Controllers
             try
             {
                 _logger.LogInformation($"Deleting item with ID: {id}");
+                var item = await _itemService.GetItemByIdAsync(id);
+                if (item == null)
+                {
+                    return NotFound();
+                }
                 await _itemService.DeleteItemAsync(id);
                 return NoContent();
             }
