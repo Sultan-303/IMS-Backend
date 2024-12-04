@@ -1,127 +1,82 @@
 using IMS.DTO;
 using IMS.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace IMS.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _itemService;
-        private readonly ILogger<ItemsController> _logger;
 
-        public ItemsController(IItemService itemService, ILogger<ItemsController> logger)
+        public ItemsController(IItemService itemService)
         {
             _itemService = itemService;
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllItems()
+        public async Task<IActionResult> GetAllItems([FromQuery] string sortBy, [FromQuery] string filter, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            try
-            {
-                _logger.LogInformation("Fetching all items");
-                var items = await _itemService.GetAllItemsAsync();
-                return Ok(items);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in GetAllItems: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            var items = await _itemService.GetAllItemsAsync();
+            // Apply sorting, filtering, and pagination logic here
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetItemById(int id)
         {
-            try
+            var item = await _itemService.GetItemByIdAsync(id);
+            if (item == null)
             {
-                _logger.LogInformation($"Fetching item with ID: {id}");
-                var item = await _itemService.GetItemByIdAsync(id);
-                if (item == null)
-                {
-                    return NotFound($"Item with ID {id} not found.");
-                }
-                return Ok(item);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in GetItemById: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            return Ok(item);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddItem([FromBody] Item item)
         {
-            try
+            if (item == null)
             {
-                _logger.LogInformation("Adding new item");
-                await _itemService.AddItemAsync(item);
-                return CreatedAtAction(nameof(GetItemById), new { id = item.ItemID }, item);
+                return BadRequest("Item is null.");
             }
-            catch (ArgumentNullException ex)
-            {
-                _logger.LogWarning($"Validation error in AddItem: {ex.Message}");
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning($"Duplicate item error in AddItem: {ex.Message}");
-                return Conflict(ex.Message); // Return 409 Conflict with the error message
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in AddItem: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+
+            await _itemService.AddItemAsync(item);
+            return CreatedAtAction(nameof(GetItemById), new { id = item.ItemID }, item);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateItem(int id, [FromBody] Item item)
         {
-            if (id != item.ItemID)
+            if (item == null || item.ItemID != id)
             {
-                return BadRequest("Item ID mismatch.");
+                return BadRequest("Item is null or ID mismatch.");
             }
 
-            try
+            var existingItem = await _itemService.GetItemByIdAsync(id);
+            if (existingItem == null)
             {
-                _logger.LogInformation($"Updating item with ID: {id}");
-                await _itemService.UpdateItemAsync(item);
-                return NoContent();
+                return NotFound();
             }
-            catch (ArgumentNullException ex)
-            {
-                _logger.LogWarning($"Validation error in UpdateItem: {ex.Message}");
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in UpdateItem: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+
+            await _itemService.UpdateItemAsync(item);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {
-            try
+            var item = await _itemService.GetItemByIdAsync(id);
+            if (item == null)
             {
-                _logger.LogInformation($"Deleting item with ID: {id}");
-                await _itemService.DeleteItemAsync(id);
-                return NoContent();
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in DeleteItem: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+
+            await _itemService.DeleteItemAsync(id);
+            return NoContent();
         }
     }
 }
