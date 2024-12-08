@@ -34,9 +34,15 @@ namespace IMS.BLL.Services
             return _categoriesRepository.UpdateCategoryAsync(category);
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(int categoryId)
         {
-            return _categoriesRepository.DeleteCategoryAsync(id);
+            var category = await _categoriesRepository.GetCategoryByIdAsync(categoryId);
+            if (category == null)
+            {
+                return; // Do nothing if the category is not found
+            }
+
+            await _categoriesRepository.DeleteCategoryAsync(categoryId);
         }
     }
 }

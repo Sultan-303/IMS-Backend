@@ -92,13 +92,16 @@ namespace IMSTests.Services
         public async Task DeleteCategoryAsync_DoesNothing_WhenCategoryNotFound()
         {
             // Arrange
-            _mockCategoriesRepository.Setup(repo => repo.GetCategoryByIdAsync(It.IsAny<int>())).ReturnsAsync((Category)null);
+            var mockRepo = new Mock<ICategoriesRepository>();
+            mockRepo.Setup(repo => repo.GetCategoryByIdAsync(It.IsAny<int>())).ReturnsAsync((Category)null);
+
+            var service = new CategoriesService(mockRepo.Object);
 
             // Act
-            await _categoriesService.DeleteCategoryAsync(1);
+            await service.DeleteCategoryAsync(1);
 
             // Assert
-            _mockCategoriesRepository.Verify(repo => repo.DeleteCategoryAsync(It.IsAny<int>()), Times.Never);
+            mockRepo.Verify(repo => repo.DeleteCategoryAsync(It.IsAny<int>()), Times.Never);
         }
     }
 }
