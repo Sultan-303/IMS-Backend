@@ -23,15 +23,16 @@ namespace IMS.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllItems()
         {
+            _logger.LogInformation("Fetching all items");
             try
             {
-                _logger.LogInformation("Fetching all items");
                 var items = await _itemService.GetAllItemsAsync();
+                _logger.LogInformation("Successfully fetched all items");
                 return Ok(items);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetAllItems: {ex.Message}");
+                _logger.LogError(ex, "Error occurred while fetching all items");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -39,19 +40,21 @@ namespace IMS.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetItemById(int id)
         {
+            _logger.LogInformation("Fetching item with ID: {ItemId}", id);
             try
             {
-                _logger.LogInformation($"Fetching item with ID: {id}");
                 var item = await _itemService.GetItemByIdAsync(id);
                 if (item == null)
                 {
+                    _logger.LogWarning("Item with ID: {ItemId} not found", id);
                     return NotFound();
                 }
+                _logger.LogInformation("Successfully fetched item with ID: {ItemId}", id);
                 return Ok(item);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetItemById: {ex.Message}");
+                _logger.LogError(ex, "Error occurred while fetching item with ID: {ItemId}", id);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -61,28 +64,30 @@ namespace IMS.API.Controllers
         {
             if (item == null)
             {
-                return new BadRequestObjectResult("Item is null.");
+                _logger.LogWarning("AddItem called with null item");
+                return BadRequest("Item is null.");
             }
 
+            _logger.LogInformation("Adding new item: {ItemName}", item.ItemName);
             try
             {
-                _logger.LogInformation("Adding new item");
                 await _itemService.AddItemAsync(item);
+                _logger.LogInformation("Successfully added item: {ItemName}", item.ItemName);
                 return CreatedAtAction(nameof(GetItemById), new { id = item.ItemID }, item);
             }
             catch (ArgumentNullException ex)
             {
-                _logger.LogWarning($"Validation error in AddItem: {ex.Message}");
+                _logger.LogWarning(ex, "Validation error in AddItem: {Message}", ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning($"Duplicate item error in AddItem: {ex.Message}");
+                _logger.LogWarning(ex, "Duplicate item error in AddItem: {Message}", ex.Message);
                 return Conflict(ex.Message); // Return 409 Conflict with the error message
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AddItem: {ex.Message}");
+                _logger.LogError(ex, "Error occurred while adding item: {ItemName}", item.ItemName);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -92,34 +97,38 @@ namespace IMS.API.Controllers
         {
             if (item == null)
             {
+                _logger.LogWarning("UpdateItem called with null item");
                 return BadRequest("Item cannot be null.");
             }
 
             if (id != item.ItemID)
             {
+                _logger.LogWarning("UpdateItem called with mismatched item ID: {ItemId}", id);
                 return BadRequest("Item ID mismatch.");
             }
 
+            _logger.LogInformation("Updating item with ID: {ItemId}", id);
             try
             {
-                _logger.LogInformation($"Updating item with ID: {id}");
                 var existingItem = await _itemService.GetItemByIdAsync(id);
                 if (existingItem == null)
                 {
+                    _logger.LogWarning("Item with ID: {ItemId} not found for update", id);
                     return NotFound();
                 }
 
                 await _itemService.UpdateItemAsync(item);
+                _logger.LogInformation("Successfully updated item with ID: {ItemId}", id);
                 return NoContent();
             }
             catch (ArgumentNullException ex)
             {
-                _logger.LogWarning($"Validation error in UpdateItem: {ex.Message}");
+                _logger.LogWarning(ex, "Validation error in UpdateItem: {Message}", ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in UpdateItem: {ex.Message}");
+                _logger.LogError(ex, "Error occurred while updating item with ID: {ItemId}", id);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -127,20 +136,59 @@ namespace IMS.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {
+            _logger.LogInformation("Deleting item with ID: {ItemId}", id);
             try
             {
-                _logger.LogInformation($"Deleting item with ID: {id}");
                 var item = await _itemService.GetItemByIdAsync(id);
                 if (item == null)
                 {
+                    _logger.LogWarning("Item with ID: {ItemId} not found for deletion", id);
                     return NotFound();
                 }
+
+                // Check for related records in the Stocks table
+                var hasRelatedStocks = await _itemService.HasRelatedStocksAsync(id);
+                if (hasRelatedStocks)
+                {
+                    _logger.LogWarning("Cannot delete item with ID: {ItemId} because there are related records in the Stocks table", id);
+                    return Conflict(new { message = "Cannot delete item because there are related records in the Stocks table.", canForceDelete = true });
+                }
+
                 await _itemService.DeleteItemAsync(id);
+                _logger.LogInformation("Successfully deleted item with ID: {ItemId}", id);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in DeleteItem: {ex.Message}");
+                _logger.LogError(ex, "Error occurred while deleting item with ID: {ItemId}", id);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("{id}/force")]
+        public async Task<IActionResult> ForceDeleteItem(int id)
+        {
+            _logger.LogInformation("Force deleting item with ID: {ItemId}", id);
+            try
+            {
+                var item = await _itemService.GetItemByIdAsync(id);
+                if (item == null)
+                {
+                    _logger.LogWarning("Item with ID: {ItemId} not found for force deletion", id);
+                    return NotFound();
+                }
+
+                // Delete related records in the Stocks table
+                await _itemService.DeleteRelatedStocksAsync(id);
+
+                // Delete the item
+                await _itemService.DeleteItemAsync(id);
+                _logger.LogInformation("Successfully force deleted item with ID: {ItemId}", id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while force deleting item with ID: {ItemId}", id);
                 return StatusCode(500, "Internal server error");
             }
         }

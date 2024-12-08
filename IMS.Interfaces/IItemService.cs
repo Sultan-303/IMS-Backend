@@ -2,7 +2,6 @@ using IMS.DTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-// IItemService.cs
 namespace IMS.Interfaces
 {
     public interface IItemService
@@ -12,5 +11,7 @@ namespace IMS.Interfaces
         Task AddItemAsync(Item item);
         Task UpdateItemAsync(Item item);
         Task DeleteItemAsync(int id);
+        Task<bool> HasRelatedStocksAsync(int ItemID); // Existing method
+        Task DeleteRelatedStocksAsync(int ItemID); // New method
     }
 }

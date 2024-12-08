@@ -3,7 +3,6 @@ using IMS.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
-using System.Linq;
 
 namespace IMS.BLL.Services
 {
@@ -90,6 +89,30 @@ namespace IMS.BLL.Services
                     return;
                 }
                 await _itemRepository.DeleteItemAsync(id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> HasRelatedStocksAsync(int itemId)
+        {
+            try
+            {
+                return await _itemRepository.HasRelatedStocksAsync(itemId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task DeleteRelatedStocksAsync(int itemId)
+        {
+            try
+            {
+                await _itemRepository.DeleteRelatedStocksAsync(itemId);
             }
             catch (Exception)
             {

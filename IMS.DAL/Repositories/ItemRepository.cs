@@ -68,7 +68,13 @@ namespace IMS.DAL.Repositories
         {
             try
             {
-                _context.Items.Update(item);
+                var existingItem = await _context.Items.FindAsync(item.ItemID);
+                if (existingItem == null)
+                {
+                    throw new InvalidOperationException("Item not found.");
+                }
+
+                _context.Entry(existingItem).CurrentValues.SetValues(item);
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -87,6 +93,32 @@ namespace IMS.DAL.Repositories
                     _context.Items.Remove(item);
                     await _context.SaveChangesAsync();
                 }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> HasRelatedStocksAsync(int itemId)
+        {
+            try
+            {
+                return await _context.Stocks.AnyAsync(s => s.ItemID == itemId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task DeleteRelatedStocksAsync(int itemId)
+        {
+            try
+            {
+                var relatedStocks = _context.Stocks.Where(s => s.ItemID == itemId);
+                _context.Stocks.RemoveRange(relatedStocks);
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {

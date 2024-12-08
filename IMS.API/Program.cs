@@ -18,14 +18,13 @@ builder.Services.AddCors(options =>
                 .WithOrigins("http://localhost:3000") // URL of React app
                 .AllowAnyHeader()
                 .AllowAnyMethod()
-                .AllowCredentials()
-            ; // Ensure credentials are allowed if needed
+                .AllowCredentials(); // Ensure credentials are allowed if needed
         });
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -66,13 +65,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowReactApp");
-
 app.UseHttpsRedirection();
-
 app.UseMiddleware<ExceptionMiddleware>();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
