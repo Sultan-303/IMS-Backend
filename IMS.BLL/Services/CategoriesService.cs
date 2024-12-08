@@ -1,7 +1,5 @@
 using IMS.DTO;
 using IMS.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace IMS.BLL.Services
 {
@@ -34,15 +32,15 @@ namespace IMS.BLL.Services
             return _categoriesRepository.UpdateCategoryAsync(category);
         }
 
-        public async Task DeleteCategoryAsync(int categoryId)
+        public async Task DeleteCategoryAsync(int id)
         {
-            var category = await _categoriesRepository.GetCategoryByIdAsync(categoryId);
+            var category = await _categoriesRepository.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return; // Do nothing if the category is not found
             }
 
-            await _categoriesRepository.DeleteCategoryAsync(categoryId);
+            await _categoriesRepository.DeleteCategoryAsync(id);
         }
     }
 }

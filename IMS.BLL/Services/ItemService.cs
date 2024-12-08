@@ -3,16 +3,19 @@ using IMS.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace IMS.BLL.Services
 {
     public class ItemService : IItemService
     {
         private readonly IItemRepository _itemRepository;
+        private readonly ILogger<ItemService> _logger;
 
-        public ItemService(IItemRepository itemRepository)
+        public ItemService(IItemRepository itemRepository, ILogger<ItemService> logger)
         {
             _itemRepository = itemRepository;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Item>> GetAllItemsAsync()
@@ -21,9 +24,10 @@ namespace IMS.BLL.Services
             {
                 return await _itemRepository.GetAllItemsAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while getting all items.");
+                throw new InvalidOperationException("Error occurred while getting all items.", ex);
             }
         }
 
@@ -34,9 +38,10 @@ namespace IMS.BLL.Services
                 var item = await _itemRepository.GetItemByIdAsync(id);
                 return item;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while getting item by ID: {ItemID}", id);
+                throw new InvalidOperationException($"Error occurred while getting item by ID: {id}", ex);
             }
         }
 
@@ -56,9 +61,10 @@ namespace IMS.BLL.Services
 
                 await _itemRepository.AddItemAsync(item);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while adding item.");
+                throw new InvalidOperationException("Error occurred while adding item.", ex);
             }
         }
 
@@ -73,9 +79,10 @@ namespace IMS.BLL.Services
             {
                 await _itemRepository.UpdateItemAsync(item);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while updating item.");
+                throw new InvalidOperationException("Error occurred while updating item.", ex);
             }
         }
 
@@ -90,33 +97,36 @@ namespace IMS.BLL.Services
                 }
                 await _itemRepository.DeleteItemAsync(id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while deleting item with ID: {Id}", id);
+                throw new InvalidOperationException($"Error occurred while deleting item with ID: {id}", ex);
             }
         }
 
-        public async Task<bool> HasRelatedStocksAsync(int itemId)
+        public async Task<bool> HasRelatedStocksAsync(int ItemID)
         {
             try
             {
-                return await _itemRepository.HasRelatedStocksAsync(itemId);
+                return await _itemRepository.HasRelatedStocksAsync(ItemID);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while checking related stocks for item ID: {ItemID}", ItemID);
+                throw new InvalidOperationException($"Error occurred while checking related stocks for item ID: {ItemID}", ex);
             }
         }
 
-        public async Task DeleteRelatedStocksAsync(int itemId)
+        public async Task DeleteRelatedStocksAsync(int ItemID)
         {
             try
             {
-                await _itemRepository.DeleteRelatedStocksAsync(itemId);
+                await _itemRepository.DeleteRelatedStocksAsync(ItemID);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error occurred while deleting related stocks for item ID: {ItemID}", ItemID);
+                throw new InvalidOperationException($"Error occurred while deleting related stocks for item ID: {ItemID}", ex);
             }
         }
     }
