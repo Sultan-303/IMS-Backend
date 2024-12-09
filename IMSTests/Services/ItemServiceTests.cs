@@ -1,6 +1,7 @@
 using IMS.BLL.Services;
 using IMS.DTO;
 using IMS.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,14 @@ namespace IMSTests.Services
     public class ItemServiceTests
     {
         private readonly Mock<IItemRepository> _mockItemRepository;
+        private readonly Mock<ILogger<ItemService>> _mockLogger;
         private readonly ItemService _itemService;
 
         public ItemServiceTests()
         {
             _mockItemRepository = new Mock<IItemRepository>();
-            _itemService = new ItemService(_mockItemRepository.Object);
+            _mockLogger = new Mock<ILogger<ItemService>>();
+            _itemService = new ItemService(_mockItemRepository.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -115,16 +118,26 @@ namespace IMSTests.Services
         }
 
         [Fact]
-        public async Task DeleteItemAsync_DoesNothing_WhenItemNotFound()
+        public async Task HasRelatedStocksAsync_ReturnsTrue_WhenRelatedStocksExist()
         {
             // Arrange
-            _mockItemRepository.Setup(repo => repo.GetItemByIdAsync(It.IsAny<int>())).ReturnsAsync((Item)null);
+            _mockItemRepository.Setup(repo => repo.HasRelatedStocksAsync(It.IsAny<int>())).ReturnsAsync(true);
 
             // Act
-            await _itemService.DeleteItemAsync(1);
+            var result = await _itemService.HasRelatedStocksAsync(1);
 
             // Assert
-            _mockItemRepository.Verify(repo => repo.DeleteItemAsync(It.IsAny<int>()), Times.Never);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task DeleteRelatedStocksAsync_DeletesRelatedStocks()
+        {
+            // Act
+            await _itemService.DeleteRelatedStocksAsync(1);
+
+            // Assert
+            _mockItemRepository.Verify(repo => repo.DeleteRelatedStocksAsync(1), Times.Once);
         }
     }
 }
