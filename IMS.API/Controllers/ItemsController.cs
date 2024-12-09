@@ -14,6 +14,8 @@ namespace IMS.API.Controllers
         private readonly IItemService _itemService;
         private readonly ILogger<ItemsController> _logger;
 
+        private const string InternalServerError = "Internal server error";
+
         public ItemsController(IItemService itemService, ILogger<ItemsController> logger)
         {
             _itemService = itemService;
@@ -33,7 +35,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching all items");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -55,7 +57,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching item with ID: {ItemId}", id);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -83,12 +85,12 @@ namespace IMS.API.Controllers
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Duplicate item error in AddItem: {Message}", ex.Message);
-                return Conflict(ex.Message); // Return 409 Conflict with the error message
+                return Conflict(ex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while adding item: {ItemName}", item.ItemName);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -129,7 +131,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while updating item with ID: {ItemId}", id);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -161,7 +163,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while deleting item with ID: {ItemId}", id);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -189,7 +191,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while force deleting item with ID: {ItemId}", id);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, InternalServerError);
             }
         }
     }

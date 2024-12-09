@@ -14,6 +14,8 @@ namespace IMS.API.Controllers
         private readonly IStockService _stockService;
         private readonly ILogger<StockController> _logger;
 
+        private const string InternalServerError = "Internal server error";
+
         public StockController(IStockService stockService, ILogger<StockController> logger)
         {
             _stockService = stockService;
@@ -27,13 +29,13 @@ namespace IMS.API.Controllers
             {
                 _logger.LogInformation("Fetching all stock");
                 var stock = await _stockService.GetAllStockAsync();
-                _logger.LogInformation($"Fetched {stock.Count()} stock items");
+                _logger.LogInformation("Fetched {StockCount} stock items", stock.Count());
                 return Ok(stock);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetAllStock: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Error in GetAllStock");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -42,20 +44,20 @@ namespace IMS.API.Controllers
         {
             try
             {
-                _logger.LogInformation($"Fetching stock with ID: {id}");
+                _logger.LogInformation("Fetching stock with ID: {StockId}", id);
                 var stock = await _stockService.GetStockByIdAsync(id);
                 if (stock == null)
                 {
-                    _logger.LogWarning($"Stock with ID {id} not found.");
+                    _logger.LogWarning("Stock with ID {StockId} not found.", id);
                     return NotFound($"Stock with ID {id} not found.");
                 }
-                _logger.LogInformation($"Fetched stock with ID: {id}");
+                _logger.LogInformation("Fetched stock with ID: {StockId}", id);
                 return Ok(stock);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetStockById: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Error in GetStockById");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -64,20 +66,20 @@ namespace IMS.API.Controllers
         {
             try
             {
-                _logger.LogInformation($"Adding new stock: {stock}");
+                _logger.LogInformation("Adding new stock: {@Stock}", stock);
                 await _stockService.AddStockAsync(stock);
-                _logger.LogInformation($"Added stock with ID: {stock.StockID}");
+                _logger.LogInformation("Added stock with ID: {StockID}", stock.StockID);
                 return CreatedAtAction(nameof(GetStockById), new { id = stock.StockID }, stock);
             }
             catch (ArgumentNullException ex)
             {
-                _logger.LogWarning($"Validation error in AddStock: {ex.Message}");
+                _logger.LogWarning(ex, "Validation error in AddStock: {Message}", ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AddStock: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Error in AddStock: {Message}", ex.Message);
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -86,25 +88,25 @@ namespace IMS.API.Controllers
         {
             if (id != stock.StockID)
             {
-                _logger.LogWarning($"Stock ID mismatch: {id} != {stock.StockID}");
+                _logger.LogWarning("Stock ID mismatch: {Id} != {StockID}", id, stock.StockID);
                 return BadRequest("Stock ID mismatch.");
             }
 
             try
             {
-                _logger.LogInformation($"Updating stock with ID: {id}");
+                _logger.LogInformation("Updating stock with ID: {StockId}", id);
                 await _stockService.UpdateStockAsync(stock);
-                _logger.LogInformation($"Updated stock with ID: {id}");
+                _logger.LogInformation("Updated stock with ID: {StockId}", id);
                 return NoContent();
             }
             catch (ArgumentNullException ex)
             {
-                _logger.LogWarning($"Validation error in UpdateStock: {ex.Message}");
+                _logger.LogWarning(ex, "Validation error in UpdateStock: {Message}", ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in UpdateStock: {ex.Message}");
+                _logger.LogError(ex, "Error in UpdateStock: {Message}", ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -114,14 +116,14 @@ namespace IMS.API.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting stock with ID: {id}");
+                _logger.LogInformation("Deleting stock with ID: {StockId}", id);
                 await _stockService.DeleteStockAsync(id);
-                _logger.LogInformation($"Deleted stock with ID: {id}");
+                _logger.LogInformation("Deleted stock with ID: {StockId}", id);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in DeleteStock: {ex.Message}");
+                _logger.LogError(ex, "Error in DeleteStock: {Message}", ex.Message);
                 return StatusCode(500, "Internal server error");
             }
         }

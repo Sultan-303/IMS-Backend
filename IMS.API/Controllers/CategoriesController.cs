@@ -13,6 +13,8 @@ namespace IMS.API.Controllers
         private readonly ICategoriesService _categoriesService;
         private readonly ILogger<CategoriesController> _logger;
 
+        private const string InternalServerError = "Internal Server Error";
+
         public CategoriesController(ICategoriesService categoriesService, ILogger<CategoriesController> logger)
         {
             _categoriesService = categoriesService;
@@ -29,8 +31,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetAllCategories: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError(ex, "Error in GetAllCategories");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -48,8 +50,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetCategoryById: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError(ex, "Error in GetCategoryById");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -68,8 +70,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AddCategory: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError(ex, "Error in AddCategory");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -94,8 +96,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in UpdateCategory: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError(ex, "Error in UpdateCategory");
+                return StatusCode(500, InternalServerError);
             }
         }
 
@@ -115,8 +117,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in DeleteCategory: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError(ex, "Error in DeleteCategory");
+                return StatusCode(500, InternalServerError);
             }
         }
     }
