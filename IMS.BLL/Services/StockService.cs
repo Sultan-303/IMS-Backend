@@ -24,13 +24,13 @@ namespace IMS.BLL.Services
             {
                 _logger.LogInformation("Fetching all stock from repository");
                 var stock = await _stockRepository.GetAllStockAsync();
-                _logger.LogInformation($"Fetched {stock.Count()} stock items from repository");
-                return stock;
+                _logger.LogInformation("Fetched {StockCount} stock items from repository", stock.Count());
+                return stock ?? new List<Stock>(); // null check
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetAllStockAsync: {ex.Message}");
-                throw;
+                _logger.LogError(ex, "Error in GetAllStockAsync");
+                throw new InvalidOperationException("An error occurred while fetching all stock.", ex);
             }
         }
 
@@ -38,22 +38,22 @@ namespace IMS.BLL.Services
         {
             try
             {
-                _logger.LogInformation($"Fetching stock with ID: {id} from repository");
+                _logger.LogInformation("Fetching stock with ID: {StockId} from repository", id);
                 var stock = await _stockRepository.GetStockByIdAsync(id);
                 if (stock == null)
                 {
-                    _logger.LogWarning($"Stock with ID {id} not found in repository.");
+                    _logger.LogWarning("Stock with ID {StockId} not found in repository.", id);
                 }
                 else
                 {
-                    _logger.LogInformation($"Fetched stock with ID: {id} from repository");
+                    _logger.LogInformation("Fetched stock with ID: {StockId} from repository", id);
                 }
                 return stock;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetStockByIdAsync: {ex.Message}");
-                throw;
+                _logger.LogError(ex, "Error in GetStockByIdAsync");
+                throw new InvalidOperationException($"An error occurred while fetching stock with ID {id}.", ex);
             }
         }
 
@@ -67,14 +67,14 @@ namespace IMS.BLL.Services
 
             try
             {
-                _logger.LogInformation($"Adding stock to repository: {stock}");
+                _logger.LogInformation("Adding stock to repository: {@Stock}", stock);
                 await _stockRepository.AddStockAsync(stock);
-                _logger.LogInformation($"Added stock with ID: {stock.StockID} to repository");
+                _logger.LogInformation("Added stock with ID: {StockID} to repository", stock.StockID);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AddStockAsync: {ex.Message}");
-                throw;
+                _logger.LogError(ex, "Error in AddStockAsync");
+                throw new InvalidOperationException("An error occurred while adding stock.", ex);
             }
         }
 
@@ -88,14 +88,14 @@ namespace IMS.BLL.Services
 
             try
             {
-                _logger.LogInformation($"Updating stock in repository: {stock}");
+                _logger.LogInformation("Updating stock in repository: {@Stock}", stock);
                 await _stockRepository.UpdateStockAsync(stock);
-                _logger.LogInformation($"Updated stock with ID: {stock.StockID} in repository");
+                _logger.LogInformation("Updated stock with ID: {StockID} in repository", stock.StockID);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in UpdateStockAsync: {ex.Message}");
-                throw;
+                _logger.LogError(ex, "Error in UpdateStockAsync");
+                throw new InvalidOperationException("An error occurred while updating stock.", ex);
             }
         }
 
@@ -106,16 +106,16 @@ namespace IMS.BLL.Services
         var stock = await _stockRepository.GetStockByIdAsync(id);
         if (stock == null)
         {
-            _logger.LogWarning($"Stock with ID {id} not found in repository.");
-            return; // Ensure no further action is taken if stock is not found
+            _logger.LogWarning("Stock with ID {StockId} not found in repository.", id);
+            return; // stop if no stock is found
         }
         await _stockRepository.DeleteStockAsync(id);
-        _logger.LogInformation($"Deleted stock with ID: {id} from repository");
+        _logger.LogInformation("Deleted stock with ID: {StockId} from repository", id);
     }
     catch (Exception ex)
     {
-        _logger.LogError($"Error in DeleteStockAsync: {ex.Message}");
-        throw;
+        _logger.LogError(ex, "Error in DeleteStockAsync");
+        throw new InvalidOperationException($"An error occurred while deleting stock with ID {id}.", ex);
     }
 }
     }

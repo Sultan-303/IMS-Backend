@@ -21,8 +21,10 @@ namespace IMS.DAL.Repositories
             {
                 return await _context.Items.ToListAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Log the exception (you can replace this with your actual logging mechanism)
+                Console.WriteLine($"An error occurred: {ex.Message}");
                 throw;
             }
         }

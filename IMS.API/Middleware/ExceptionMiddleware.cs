@@ -26,7 +26,7 @@ namespace IMS.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An unhandled exception occurred: {ex}");
+                _logger.LogError(ex, "An unhandled exception occurred");
                 await HandleExceptionAsync(httpContext, ex);
             }
         }

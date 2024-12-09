@@ -22,7 +22,8 @@ namespace IMS.DAL.Repositories
 
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id) ?? throw new KeyNotFoundException($"Category with id {id} not found.");
+            return category;
         }
 
         public async Task AddCategoryAsync(Category category)
