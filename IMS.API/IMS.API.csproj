@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IMS.BLL\IMS.BLL.csproj" />
+    <ProjectReference Include="..\IMS.Common\IMS.Common.csproj" />
     <ProjectReference Include="..\IMS.DAL\IMS.DAL.csproj" />
-    <ProjectReference Include="..\IMS.DTO\IMS.DTO.csproj" />
     <ProjectReference Include="..\IMS.Interfaces\IMS.Interfaces.csproj" />
   </ItemGroup>
 

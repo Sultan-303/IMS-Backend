@@ -1,5 +1,10 @@
-using IMS.DTO;
-using IMS.Interfaces;
+using IMS.Common.Models;
+using IMS.Common.Entities;
+using IMS.Interfaces.Services;
+using IMS.Interfaces.Repositories;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IMS.BLL.Services
 {
@@ -12,24 +17,38 @@ namespace IMS.BLL.Services
             _categoriesRepository = categoriesRepository;
         }
 
-        public Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        public async Task<IEnumerable<CategoryModel>> GetAllCategoriesAsync()
         {
-            return _categoriesRepository.GetAllCategoriesAsync();
+            var categories = await _categoriesRepository.GetAllCategoriesAsync();
+            return categories.Select(ToCategoryModel);
         }
 
-        public Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<CategoryModel> GetCategoryByIdAsync(int id)
         {
-            return _categoriesRepository.GetCategoryByIdAsync(id);
+            var category = await _categoriesRepository.GetCategoryByIdAsync(id);
+            return category == null ? null : ToCategoryModel(category);
         }
 
-        public Task AddCategoryAsync(Category category)
+        public async Task AddCategoryAsync(CategoryModel categoryModel)
         {
-            return _categoriesRepository.AddCategoryAsync(category);
+            if (categoryModel == null)
+            {
+                throw new ArgumentNullException(nameof(categoryModel), "Category is null.");
+            }
+
+            var category = ToCategoryEntity(categoryModel);
+            await _categoriesRepository.AddCategoryAsync(category);
         }
 
-        public Task UpdateCategoryAsync(Category category)
+        public async Task UpdateCategoryAsync(CategoryModel categoryModel)
         {
-            return _categoriesRepository.UpdateCategoryAsync(category);
+            if (categoryModel == null)
+            {
+                throw new ArgumentNullException(nameof(categoryModel), "Category is null.");
+            }
+
+            var category = ToCategoryEntity(categoryModel);
+            await _categoriesRepository.UpdateCategoryAsync(category);
         }
 
         public async Task DeleteCategoryAsync(int id)
@@ -41,6 +60,24 @@ namespace IMS.BLL.Services
             }
 
             await _categoriesRepository.DeleteCategoryAsync(id);
+        }
+
+        private CategoryModel ToCategoryModel(Category category)
+        {
+            return new CategoryModel
+            {
+                CategoryID = category.CategoryID,
+                CategoryName = category.CategoryName
+            };
+        }
+
+        private Category ToCategoryEntity(CategoryModel categoryModel)
+        {
+            return new Category
+            {
+                CategoryID = categoryModel.CategoryID,
+                CategoryName = categoryModel.CategoryName
+            };
         }
     }
 }

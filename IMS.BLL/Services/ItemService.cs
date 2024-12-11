@@ -1,133 +1,102 @@
-using IMS.DTO;
-using IMS.Interfaces;
+using IMS.Common.Models;
+using IMS.Common.Entities;
+using IMS.Interfaces.Repositories;
+using IMS.Interfaces.Services;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System;
-using Microsoft.Extensions.Logging;
 
 namespace IMS.BLL.Services
 {
     public class ItemService : IItemService
     {
         private readonly IItemRepository _itemRepository;
-        private readonly ILogger<ItemService> _logger;
 
-        public ItemService(IItemRepository itemRepository, ILogger<ItemService> logger)
+        public ItemService(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
-            _logger = logger;
         }
 
-        public async Task<IEnumerable<Item>> GetAllItemsAsync()
+        public async Task<IEnumerable<ItemModel>> GetAllItemsAsync()
         {
-            try
-            {
-                return await _itemRepository.GetAllItemsAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting all items.");
-                throw new InvalidOperationException("Error occurred while getting all items.", ex);
-            }
+            var items = await _itemRepository.GetAllItemsAsync();
+            return items.Select(ToItemModel);
         }
 
-        public async Task<Item> GetItemByIdAsync(int id)
+        public async Task<ItemModel> GetItemByIdAsync(int id)
         {
-            try
-            {
-                var item = await _itemRepository.GetItemByIdAsync(id);
-                return item;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting item by ID: {ItemID}", id);
-                throw new InvalidOperationException($"Error occurred while getting item by ID: {id}", ex);
-            }
+            var item = await _itemRepository.GetItemByIdAsync(id);
+            return item == null ? null : ToItemModel(item);
         }
 
-        public async Task AddItemAsync(Item item)
+        public async Task AddItemAsync(ItemModel itemModel)
         {
-            if (item == null)
+            if (itemModel == null)
             {
-                throw new ArgumentNullException(nameof(item), "Item is null.");
+                throw new ArgumentNullException(nameof(itemModel), "Item is null.");
             }
 
-            try
+            if (await _itemRepository.ItemNameExistsAsync(itemModel.ItemName))
             {
-                if (await _itemRepository.ItemNameExistsAsync(item.ItemName))
-                {
-                    throw new InvalidOperationException($"Item with name {item.ItemName} already exists.");
-                }
+                throw new InvalidOperationException($"Item with name {itemModel.ItemName} already exists.");
+            }
 
-                await _itemRepository.AddItemAsync(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while adding item.");
-                throw new InvalidOperationException("Error occurred while adding item.", ex);
-            }
+            var item = ToItemEntity(itemModel);
+            await _itemRepository.AddItemAsync(item);
         }
 
-        public async Task UpdateItemAsync(Item item)
+        public async Task UpdateItemAsync(ItemModel itemModel)
         {
-            if (item == null)
+            if (itemModel == null)
             {
-                throw new ArgumentNullException(nameof(item), "Item is null.");
+                throw new ArgumentNullException(nameof(itemModel), "Item is null.");
             }
 
-            try
-            {
-                await _itemRepository.UpdateItemAsync(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while updating item.");
-                throw new InvalidOperationException("Error occurred while updating item.", ex);
-            }
+            var item = ToItemEntity(itemModel);
+            await _itemRepository.UpdateItemAsync(item);
         }
 
         public async Task DeleteItemAsync(int id)
         {
-            try
+            var item = await _itemRepository.GetItemByIdAsync(id);
+            if (item == null)
             {
-                var item = await _itemRepository.GetItemByIdAsync(id);
-                if (item == null)
-                {
-                    return;
-                }
-                await _itemRepository.DeleteItemAsync(id);
+                return;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while deleting item with ID: {Id}", id);
-                throw new InvalidOperationException($"Error occurred while deleting item with ID: {id}", ex);
-            }
+            await _itemRepository.DeleteItemAsync(id);
         }
 
-        public async Task<bool> HasRelatedStocksAsync(int ItemID)
+        public async Task<bool> HasRelatedStocksAsync(int itemId)
         {
-            try
-            {
-                return await _itemRepository.HasRelatedStocksAsync(ItemID);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while checking related stocks for item ID: {ItemID}", ItemID);
-                throw new InvalidOperationException($"Error occurred while checking related stocks for item ID: {ItemID}", ex);
-            }
+            return await _itemRepository.HasRelatedStocksAsync(itemId);
         }
 
-        public async Task DeleteRelatedStocksAsync(int ItemID)
+        public async Task DeleteRelatedStocksAsync(int itemId)
         {
-            try
+            await _itemRepository.DeleteRelatedStocksAsync(itemId);
+        }
+
+        private ItemModel ToItemModel(Item item)
+        {
+            return new ItemModel
             {
-                await _itemRepository.DeleteRelatedStocksAsync(ItemID);
-            }
-            catch (Exception ex)
+                ItemID = item.ItemID,
+                ItemName = item.ItemName,
+                Unit = item.Unit,
+                Price = item.Price
+            };
+        }
+
+        private Item ToItemEntity(ItemModel itemModel)
+        {
+            return new Item
             {
-                _logger.LogError(ex, "Error occurred while deleting related stocks for item ID: {ItemID}", ItemID);
-                throw new InvalidOperationException($"Error occurred while deleting related stocks for item ID: {ItemID}", ex);
-            }
+                ItemID = itemModel.ItemID,
+                ItemName = itemModel.ItemName,
+                Unit = itemModel.Unit,
+                Price = itemModel.Price
+            };
         }
     }
 }

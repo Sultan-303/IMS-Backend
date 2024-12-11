@@ -1,4 +1,4 @@
-using IMS.DTO;
+using IMS.Common.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IMS.DAL
@@ -32,10 +32,10 @@ namespace IMS.DAL
 
             // Configure the relationship between Stock and Item
             modelBuilder.Entity<Stock>()
-                .HasOne<Item>()
-                .WithMany()
+                .HasOne(s => s.Item)                // Specify the navigation property
+                .WithMany(i => i.Stocks)            // Specify the collection navigation
                 .HasForeignKey(s => s.ItemID)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure the many-to-many relationship between Item and Category
             modelBuilder.Entity<ItemCategory>()

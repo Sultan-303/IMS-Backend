@@ -1,4 +1,4 @@
-namespace IMS.DTO
+﻿namespace IMS.Common.Entities
 {
     public class Category
     {

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IMS.DTO\IMS.DTO.csproj" />
+    <ProjectReference Include="..\IMS.Common\IMS.Common.csproj" />
   </ItemGroup>
 
 </Project>

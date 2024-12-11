@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace IMS.DTO
+namespace IMS.Common.Entities
 {
     public class ItemCategory
     {

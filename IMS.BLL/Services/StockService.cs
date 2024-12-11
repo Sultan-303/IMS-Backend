@@ -1,122 +1,90 @@
-﻿using IMS.DTO;
-using IMS.Interfaces;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using IMS.Common.Models;
+using IMS.Common.Entities;
+using IMS.Interfaces.Repositories;
+using IMS.Interfaces.Services;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace IMS.BLL.Services
 {
     public class StockService : IStockService
     {
         private readonly IStockRepository _stockRepository;
-        private readonly ILogger<StockService> _logger;
 
-        public StockService(IStockRepository stockRepository, ILogger<StockService> logger)
+        public StockService(IStockRepository stockRepository)
         {
             _stockRepository = stockRepository;
-            _logger = logger;
         }
 
-        public async Task<IEnumerable<Stock>> GetAllStockAsync()
+        public async Task<IEnumerable<StockModel>> GetAllStockAsync()
         {
-            try
-            {
-                _logger.LogInformation("Fetching all stock from repository");
-                var stock = await _stockRepository.GetAllStockAsync();
-                _logger.LogInformation("Fetched {StockCount} stock items from repository", stock.Count());
-                return stock ?? new List<Stock>(); // null check
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetAllStockAsync");
-                throw new InvalidOperationException("An error occurred while fetching all stock.", ex);
-            }
+            var stocks = await _stockRepository.GetAllStockAsync();
+            return stocks.Select(ToStockModel);
         }
 
-        public async Task<Stock> GetStockByIdAsync(int id)
+        public async Task<StockModel> GetStockByIdAsync(int id)
         {
-            try
-            {
-                _logger.LogInformation("Fetching stock with ID: {StockId} from repository", id);
-                var stock = await _stockRepository.GetStockByIdAsync(id);
-                if (stock == null)
-                {
-                    _logger.LogWarning("Stock with ID {StockId} not found in repository.", id);
-                }
-                else
-                {
-                    _logger.LogInformation("Fetched stock with ID: {StockId} from repository", id);
-                }
-                return stock;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetStockByIdAsync");
-                throw new InvalidOperationException($"An error occurred while fetching stock with ID {id}.", ex);
-            }
+            var stock = await _stockRepository.GetStockByIdAsync(id);
+            return stock == null ? null : ToStockModel(stock);
         }
 
-        public async Task AddStockAsync(Stock stock)
+        public async Task AddStockAsync(StockModel stockModel)
         {
-            if (stock == null)
+            if (stockModel == null)
             {
-                _logger.LogWarning("Received null stock object");
-                throw new ArgumentNullException(nameof(stock), "Stock is null.");
+                throw new ArgumentNullException(nameof(stockModel), "Stock is null.");
             }
 
-            try
-            {
-                _logger.LogInformation("Adding stock to repository: {@Stock}", stock);
-                await _stockRepository.AddStockAsync(stock);
-                _logger.LogInformation("Added stock with ID: {StockID} to repository", stock.StockID);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in AddStockAsync");
-                throw new InvalidOperationException("An error occurred while adding stock.", ex);
-            }
+            var stock = ToStockEntity(stockModel);
+            await _stockRepository.AddStockAsync(stock);
         }
 
-        public async Task UpdateStockAsync(Stock stock)
+        public async Task UpdateStockAsync(StockModel stockModel)
         {
-            if (stock == null)
+            if (stockModel == null)
             {
-                _logger.LogWarning("Received null stock object");
-                throw new ArgumentNullException(nameof(stock), "Stock is null.");
+                throw new ArgumentNullException(nameof(stockModel), "Stock is null.");
             }
 
-            try
-            {
-                _logger.LogInformation("Updating stock in repository: {@Stock}", stock);
-                await _stockRepository.UpdateStockAsync(stock);
-                _logger.LogInformation("Updated stock with ID: {StockID} in repository", stock.StockID);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in UpdateStockAsync");
-                throw new InvalidOperationException("An error occurred while updating stock.", ex);
-            }
+            var stock = ToStockEntity(stockModel);
+            await _stockRepository.UpdateStockAsync(stock);
         }
 
         public async Task DeleteStockAsync(int id)
-{
-    try
-    {
-        var stock = await _stockRepository.GetStockByIdAsync(id);
-        if (stock == null)
         {
-            _logger.LogWarning("Stock with ID {StockId} not found in repository.", id);
-            return; // stop if no stock is found
+            var stock = await _stockRepository.GetStockByIdAsync(id);
+            if (stock == null)
+            {
+                return; // Do nothing if the stock is not found
+            }
+
+            await _stockRepository.DeleteStockAsync(id);
         }
-        await _stockRepository.DeleteStockAsync(id);
-        _logger.LogInformation("Deleted stock with ID: {StockId} from repository", id);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error in DeleteStockAsync");
-        throw new InvalidOperationException($"An error occurred while deleting stock with ID {id}.", ex);
-    }
-}
+
+        private StockModel ToStockModel(Stock stock)
+        {
+            return new StockModel
+            {
+                StockID = stock.StockID,
+                ItemID = stock.ItemID,
+                Quantity = stock.QuantityInStock,
+                ArrivalDate = stock.ArrivalDate,
+                ExpiryDate = stock.ExpiryDate ?? DateTime.MinValue
+            };
+        }
+
+        private Stock ToStockEntity(StockModel stockModel)
+        {
+            return new Stock
+            {
+                StockID = stockModel.StockID,
+                ItemID = stockModel.ItemID,
+                QuantityInStock = stockModel.Quantity,
+                ArrivalDate = stockModel.ArrivalDate,
+                ExpiryDate = stockModel.ExpiryDate
+            };
+        }
     }
 }

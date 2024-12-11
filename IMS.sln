@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IMS.BLL", "IMS.BLL\IMS.BLL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IMS.Interfaces", "IMS.Interfaces\IMS.Interfaces.csproj", "{2A04EA31-3A17-4884-9599-79BA7CCE9CCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.DTO", "IMS.DTO\IMS.DTO.csproj", "{FD61E094-ACB2-41FA-9ECB-204D08C41A4A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMS.Common", "IMS.Common\IMS.Common.csproj", "{41ADA959-BD10-4D24-9ABA-C55817343829}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{2A04EA31-3A17-4884-9599-79BA7CCE9CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A04EA31-3A17-4884-9599-79BA7CCE9CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A04EA31-3A17-4884-9599-79BA7CCE9CCA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD61E094-ACB2-41FA-9ECB-204D08C41A4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD61E094-ACB2-41FA-9ECB-204D08C41A4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD61E094-ACB2-41FA-9ECB-204D08C41A4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD61E094-ACB2-41FA-9ECB-204D08C41A4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41ADA959-BD10-4D24-9ABA-C55817343829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41ADA959-BD10-4D24-9ABA-C55817343829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41ADA959-BD10-4D24-9ABA-C55817343829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41ADA959-BD10-4D24-9ABA-C55817343829}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

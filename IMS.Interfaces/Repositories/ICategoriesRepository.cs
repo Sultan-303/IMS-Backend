@@ -1,8 +1,6 @@
-using IMS.DTO;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using IMS.Common.Entities;
 
-namespace IMS.Interfaces
+namespace IMS.Interfaces.Repositories
 {
     public interface ICategoriesRepository
     {

@@ -1,15 +1,16 @@
-﻿using System;
+﻿﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace IMS.DTO
+namespace IMS.Common.Entities
 {
     public class Stock
     {
         [Key]
         public int StockID { get; set; }
 
-        [ForeignKey("Item")]
+        [Required]
+        [ForeignKey(nameof(Item))]
         public int ItemID { get; set; }
 
         [Required]
@@ -19,5 +20,7 @@ namespace IMS.DTO
         public DateTime ArrivalDate { get; set; }
 
         public DateTime? ExpiryDate { get; set; }
+
+        public virtual Item Item { get; set; }
     }
 }

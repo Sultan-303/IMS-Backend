@@ -1,7 +1,8 @@
 using IMS.DAL;
 using IMS.DAL.Repositories;
 using IMS.BLL.Services;
-using IMS.Interfaces;
+using IMS.Interfaces.Services;
+using IMS.Interfaces.Repositories;
 using IMS.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,59 +16,77 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("http://localhost:3000") // URL of React app
+                .WithOrigins(
+                    "http://localhost:3000",     // React app
+                    "https://localhost:3000",
+                    "http://localhost:5079",     // API HTTP
+                    "https://localhost:7237"     // API HTTPS
+                )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
-                .AllowCredentials(); // Ensure credentials are allowed if needed
+                .SetIsOriginAllowed(_ => true)   // Allow any origin
+                .AllowCredentials();
         });
 });
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+// Configure Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "IMS API", Version = "v1" });
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "IMS API", 
+        Version = "v1",
+        Description = "Inventory Management System API"
+    });
 });
 
-// Register the CategoryService and ICategoriesService
-builder.Services.AddScoped<ICategoriesService, CategoriesService>(); // BLL
-builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>(); // DAL
+// Register Services
+builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
-// Register the ItemService and IItemService
-builder.Services.AddScoped<IItemService, ItemService>(); // BLL
-builder.Services.AddScoped<IItemRepository, ItemRepository>(); // DAL
-
-// Register the StockService and IStockService
-builder.Services.AddScoped<IStockService, StockService>(); // BLL
-builder.Services.AddScoped<IStockRepository, StockRepository>(); // DAL
-
-// Add the DbContext
+// Configure DbContext
 builder.Services.AddDbContext<IMSContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("IMS.DAL")
+    ));
 
-// Add logging
+// Configure Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "IMS API v1");
+        c.RoutePrefix = "swagger";
     });
+    app.UseDeveloperExceptionPage();
 }
 
-app.UseCors("AllowReactApp");
-app.UseHttpsRedirection();
+// Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("AllowReactApp");    // Before UseHttpsRedirection
+app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthorization();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 await app.RunAsync();

@@ -1,5 +1,5 @@
-using IMS.DTO;
-using IMS.Interfaces;
+using IMS.Common.Entities;
+using IMS.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,13 +28,13 @@ namespace IMS.DAL.Repositories
 
         public async Task AddCategoryAsync(Category category)
         {
-            await _context.Categories.AddAsync(category);
+            await _context.Set<IMS.Common.Entities.Category>().AddAsync(category);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateCategoryAsync(Category category)
         {
-            _context.Categories.Update(category);
+            _context.Set<IMS.Common.Entities.Category>().Update(category);
             await _context.SaveChangesAsync();
         }
 

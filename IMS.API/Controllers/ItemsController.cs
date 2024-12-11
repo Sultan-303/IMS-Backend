@@ -1,9 +1,6 @@
-using IMS.DTO;
-using IMS.Interfaces;
+using IMS.Interfaces.Services;
+using IMS.Common.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace IMS.API.Controllers
 {
@@ -62,7 +59,7 @@ namespace IMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] Item item)
+        public async Task<IActionResult> AddItem([FromBody] ItemModel item)
         {
             if (item == null)
             {
@@ -95,7 +92,7 @@ namespace IMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, [FromBody] Item item)
+        public async Task<IActionResult> UpdateItem(int id, [FromBody] ItemModel item)
         {
             if (item == null)
             {

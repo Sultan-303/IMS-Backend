@@ -1,13 +1,10 @@
-﻿using IMS.DTO;
-using System;
+﻿using IMS.Common.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace IMS.Interfaces
+namespace IMS.Interfaces.Repositories
 {
-    public interface IStockService
+    public interface IStockRepository
     {
         Task<IEnumerable<Stock>> GetAllStockAsync();
         Task<Stock> GetStockByIdAsync(int id);

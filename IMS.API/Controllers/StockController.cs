@@ -1,5 +1,5 @@
-﻿using IMS.DTO;
-using IMS.Interfaces;
+﻿using IMS.Interfaces.Services;
+using IMS.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +13,6 @@ namespace IMS.API.Controllers
     {
         private readonly IStockService _stockService;
         private readonly ILogger<StockController> _logger;
-
-        private const string InternalServerError = "Internal server error";
 
         public StockController(IStockService stockService, ILogger<StockController> logger)
         {
@@ -34,8 +32,8 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetAllStock");
-                return StatusCode(500, InternalServerError);
+                _logger.LogError(ex, "Error in GetAllStock: {Message}", ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -56,13 +54,13 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetStockById");
-                return StatusCode(500, InternalServerError);
+                _logger.LogError(ex, "Error in GetStockById: {Message}", ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddStock([FromBody] Stock stock)
+        public async Task<IActionResult> AddStock([FromBody] StockModel stock)
         {
             try
             {
@@ -79,12 +77,12 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in AddStock: {Message}", ex.Message);
-                return StatusCode(500, InternalServerError);
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStock(int id, [FromBody] Stock stock)
+        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockModel stock)
         {
             if (id != stock.StockID)
             {
@@ -107,7 +105,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateStock: {Message}", ex.Message);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -124,7 +122,7 @@ namespace IMS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in DeleteStock: {Message}", ex.Message);
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, ex.Message);
             }
         }
     }

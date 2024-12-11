@@ -1,8 +1,8 @@
-using IMS.DTO;
-using IMS.Interfaces;
+using IMS.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using IMS.Common.Models;
 
 namespace IMS.API.Controllers
 {
@@ -56,7 +56,7 @@ namespace IMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] Category category)
+        public async Task<IActionResult> AddCategory([FromBody] CategoryModel category)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace IMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryModel category)
         {
             try
             {
