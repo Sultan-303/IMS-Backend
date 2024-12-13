@@ -9,6 +9,11 @@ using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel
+builder.WebHost.ConfigureKestrel(options => {
+    options.ListenAnyIP(80);
+});
+
 // Add CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -66,6 +71,10 @@ builder.Logging.AddDebug();
 
 var app = builder.Build();
 
+// Important: Order matters for middleware
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("AllowReactApp");    // Before UseHttpsRedirection
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -78,15 +87,17 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-// Important: Order matters for middleware
-app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors("AllowReactApp");    // Before UseHttpsRedirection
-app.UseHttpsRedirection();
 app.UseRouting();
+app.UseHttpsRedirection();
 app.UseAuthorization();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+// Explicitly set URLs
+app.Urls.Clear();
+app.Urls.Add("http://0.0.0.0:80");
 
 await app.RunAsync();
