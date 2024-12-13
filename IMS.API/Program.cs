@@ -49,6 +49,25 @@ builder.Services.AddDbContext<IMSContext>(options =>
 
 var app = builder.Build();
 
+// Add this section for database initialization
+try 
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<IMSContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        logger.LogInformation("Attempting to create database...");
+        await context.Database.EnsureCreatedAsync();
+        logger.LogInformation("Database setup completed");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database initialization failed: {ex.Message}");
+    throw;
+}
+
 // Configure middleware
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowReactApp");
