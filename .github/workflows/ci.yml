@@ -85,3 +85,18 @@ jobs:
         exit-code: '0'
         severity: 'CRITICAL'
         ignore-unfixed: true
+  
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: http://ims-api-hab.azurewebsites.net
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'ims-api-hab'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: 'imsapiregistryhab.azurecr.io/ims-api:${{ github.sha }}'
