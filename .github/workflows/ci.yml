@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Production
-      url: http://ims-api-hab.azurewebsites.net
+      url: https://ims-api-hab.azurewebsites.net/swagger
     steps:
     - name: Deploy to Azure Web App
       id: deploy
