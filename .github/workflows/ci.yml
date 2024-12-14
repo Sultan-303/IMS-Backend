@@ -63,18 +63,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Login to Azure Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: imsapiregistryhab.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-    - name: Build and Push Docker image
+    - name: Build Docker image
       uses: docker/build-push-action@v4
       with:
         context: .
-        push: true
+        push: false
         tags: imsapiregistryhab.azurecr.io/ims-api:${{ github.sha }}
     
     - name: Run Trivy vulnerability scanner
@@ -82,9 +75,23 @@ jobs:
       with:
         image-ref: 'imsapiregistryhab.azurecr.io/ims-api:${{ github.sha }}'
         format: 'table'
-        exit-code: '0'
+        exit-code: '1'  # Fail if vulnerabilities found
         severity: 'CRITICAL'
         ignore-unfixed: true
+    
+    - name: Login to Azure Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: imsapiregistryhab.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+        
+    - name: Push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: imsapiregistryhab.azurecr.io/ims-api:${{ github.sha }}
   
   deploy:
     needs: docker
