@@ -5,34 +5,51 @@ using IMS.Interfaces.Services;
 using IMS.Interfaces.Repositories;
 using IMS.API.Middleware;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Kestrel to listen on all IPs
+// Configure Kestrel
 builder.WebHost.ConfigureKestrel(options => {
-    options.ListenAnyIP(80);  // Listen on all interfaces
+    options.ListenAnyIP(80);
 });
 
 // Add CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        builder => builder
-            .WithOrigins(
-                "http://localhost:3000",
-                "https://localhost:3000"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
+        builder =>
+        {
+            builder
+                .WithOrigins(
+                    "http://localhost:3000",     // React app
+                    "https://localhost:3000",
+                    "http://localhost:5079",     // API HTTP
+                    "https://localhost:7237"     // API HTTPS
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed(_ => true)   // Allow any origin
+                .AllowCredentials();
+        });
 });
 
-// Add services
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// Register services
+// Configure Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "IMS API", 
+        Version = "v1",
+        Description = "Inventory Management System API"
+    });
+});
+
+// Register Services
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<IItemService, ItemService>();
@@ -47,21 +64,40 @@ builder.Services.AddDbContext<IMSContext>(options =>
         b => b.MigrationsAssembly("IMS.DAL")
     ));
 
+// Configure Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 var app = builder.Build();
 
-// Configure middleware
+// Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors("AllowReactApp");
+app.UseCors("AllowReactApp");    // Before UseHttpsRedirection
 
-// Development only middleware
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "IMS API v1");
+        c.RoutePrefix = "swagger";
+    });
     app.UseDeveloperExceptionPage();
 }
 
 app.UseRouting();
-app.MapControllers();
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+// Explicitly set URLs
+app.Urls.Clear();
+app.Urls.Add("http://0.0.0.0:80");
 
 await app.RunAsync();
