@@ -9,6 +9,15 @@ using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Application Insights and Logging
+builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddApplicationInsights();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 // Add CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -59,10 +68,15 @@ builder.Services.AddDbContext<IMSContext>(options =>
         b => b.MigrationsAssembly("IMS.DAL")
     ));
 
-// Configure Logging
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+// Add HTTP logging with detailed configuration
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+    logging.RequestHeaders.Add("Authorization");
+    logging.ResponseHeaders.Add("Content-Type");
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+});
 
 var app = builder.Build();
 
@@ -80,7 +94,8 @@ if (app.Environment.IsDevelopment())
 
 // Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors("AllowReactApp");    // Before UseHttpsRedirection
+app.UseHttpLogging();  // Before CORS and routing
+app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
