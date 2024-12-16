@@ -109,11 +109,14 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
+          echo "Setting connection string..."
           az webapp config connection-string set \
             --name ims-api-hab \
             --resource-group ims-rg \
             --connection-string-type SQLServer \
             --settings DefaultConnection="Server=tcp:imssqlserverhab.database.windows.net,1433;Initial Catalog=imsdb;Persist Security Info=False;User ID=sqladmin;Password=${{ secrets.SQL_PASSWORD }};MultipleActiveResultSets=False;Encrypt=true;TrustServerCertificate=False;Connection Timeout=30;"
+          echo "Verifying connection string..."
+          az webapp config connection-string list --name ims-api-hab --resource-group ims-rg
 
     - name: Deploy to Azure Web App
       id: deploy
