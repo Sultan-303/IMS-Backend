@@ -11,6 +11,7 @@ namespace IMS.Interfaces.Repositories
         Task<bool> EmailExistsAsync(string email);
         Task<IEnumerable<User>> GetAllAsync();
         Task DeleteAsync(int id);
-        Task UpdateAsync(User user);
+        Task UpdateAsync(User user);        
+        Task<IEnumerable<User>> SearchUsersAsync(string searchTerm, string role, bool? isActive); 
     }
 }

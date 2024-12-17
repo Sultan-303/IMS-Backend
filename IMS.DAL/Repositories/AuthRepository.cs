@@ -55,24 +55,48 @@ namespace IMS.DAL.Repositories
         }
 
         public async Task<IEnumerable<User>> GetAllAsync()
-    {
+          {
         return await _context.Users.ToListAsync();
-    }
+         }
 
-    public async Task DeleteAsync(int id)
-    {
+         public async Task DeleteAsync(int id)
+         {
         var user = await GetByIdAsync(id);
         if (user != null)
         {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
-    }
+          }
 
-    public async Task UpdateAsync(User user)
-    {
+        public async Task UpdateAsync(User user)
+        {
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
-    }
+        }
+
+        public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm, string role, bool? isActive)
+        {
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(u => 
+                u.Username.Contains(searchTerm) || 
+                u.Email.Contains(searchTerm));
+        }
+
+        if (!string.IsNullOrWhiteSpace(role))
+        {
+            query = query.Where(u => u.Role == role);
+        }
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(u => u.IsActive == isActive.Value);
+        }
+
+        return await query.ToListAsync();
+        }
     }
 }

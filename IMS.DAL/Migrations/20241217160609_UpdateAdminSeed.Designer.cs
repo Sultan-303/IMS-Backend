@@ -4,6 +4,7 @@ using IMS.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IMS.DAL.Migrations
 {
     [DbContext(typeof(IMSContext))]
-    partial class IMSContextModelSnapshot : ModelSnapshot
+    [Migration("20241217160609_UpdateAdminSeed")]
+    partial class UpdateAdminSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,10 +150,10 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 12, 17, 17, 0, 41, 65, DateTimeKind.Utc).AddTicks(7768),
+                            CreatedAt = new DateTime(2024, 12, 17, 16, 6, 8, 927, DateTimeKind.Utc).AddTicks(5599),
                             Email = "admin@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$wklEzO1dxjqeTZYrK1vmQeuSYZDtRo2HXi7BKSiZjMd7AjisLuo3q",
+                            PasswordHash = "$2a$11$uc8ixRfXWhrhhVyf6bNHbe3/ax04bnv5CAy0Nt/aSmfNzlcH0BNK.",
                             Role = "Admin",
                             Username = "admin"
                         });

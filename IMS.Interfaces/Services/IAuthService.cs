@@ -1,4 +1,5 @@
 using IMS.Common.DTOs.Auth;
+using IMS.Common.DTOs.Admin;
 
 namespace IMS.Interfaces.Services
 {
@@ -11,5 +12,7 @@ namespace IMS.Interfaces.Services
         Task<IEnumerable<AdminUserDTO>> GetAllUsersAsync();
         Task DeleteUserAsync(int id);
         Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto);
+        Task<DashboardStatsDTO> GetDashboardStatsAsync();
+        Task<IEnumerable<UserDTO>> SearchUsersAsync(string searchTerm, string role, bool? isActive);
     }
 }

@@ -4,6 +4,7 @@ using IMS.Common.Entities;
 using IMS.Interfaces.Repositories;
 using IMS.Interfaces.Services;
 using BCrypt.Net;
+using IMS.Common.DTOs.Admin;
 
 namespace IMS.BLL.Services
 {
@@ -135,5 +136,25 @@ namespace IMS.BLL.Services
         await _authRepository.UpdateAsync(user);
         return _mapper.Map<UserDTO>(user);
         }
+
+        public async Task<DashboardStatsDTO> GetDashboardStatsAsync()
+    {
+        var users = await _authRepository.GetAllAsync();
+        
+        return new DashboardStatsDTO
+        {
+            TotalUsers = users.Count(),
+            UsersByRole = users.GroupBy(u => u.Role)
+                             .ToDictionary(g => g.Key, g => g.Count()),
+            ActiveUsers = users.Count(u => u.IsActive),
+            InactiveUsers = users.Count(u => !u.IsActive)
+        };
+    }
+
+    public async Task<IEnumerable<UserDTO>> SearchUsersAsync(string searchTerm, string role, bool? isActive)
+    {
+        var users = await _authRepository.SearchUsersAsync(searchTerm, role, isActive);
+        return _mapper.Map<IEnumerable<UserDTO>>(users);
+    }
     }
 }
