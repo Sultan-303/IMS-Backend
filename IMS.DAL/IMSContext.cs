@@ -11,6 +11,7 @@ namespace IMS.DAL
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ItemCategory> ItemCategories { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +51,17 @@ namespace IMS.DAL
                 .HasOne(ic => ic.Category)
                 .WithMany(c => c.ItemCategories)
                 .HasForeignKey(ic => ic.CategoryID);
+
+            // Seed admin user
+            modelBuilder.Entity<User>().HasData(new User
+            {
+              Id = 1,
+              Username = "admin",
+              Email = "admin@ims.com",
+              PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+              Role = "Admin",
+              CreatedAt = DateTime.UtcNow
+            });
         }
     }
 }
