@@ -8,5 +8,8 @@ namespace IMS.Interfaces.Services
         Task<string> LoginAsync(LoginDTO loginDto);
         Task<UserDTO> GetUserByIdAsync(int id);
         Task<UserDTO> GetUserByUsernameAsync(string username);
+        Task<IEnumerable<AdminUserDTO>> GetAllUsersAsync();
+        Task DeleteUserAsync(int id);
+        Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto);
     }
 }

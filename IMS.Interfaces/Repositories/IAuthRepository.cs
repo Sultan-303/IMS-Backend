@@ -9,5 +9,8 @@ namespace IMS.Interfaces.Repositories
         Task<User> GetByUsernameAsync(string username);
         Task<bool> UsernameExistsAsync(string username);
         Task<bool> EmailExistsAsync(string email);
+        Task<IEnumerable<User>> GetAllAsync();
+        Task DeleteAsync(int id);
+        Task UpdateAsync(User user);
     }
 }

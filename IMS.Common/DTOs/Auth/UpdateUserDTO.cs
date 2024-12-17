@@ -1,11 +1,11 @@
 namespace IMS.Common.DTOs.Auth
 {
-    public class UserDTO
+    public class UpdateUserDTO
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }  // Plain text for updates
         public string Role { get; set; }
-        // No password field - security
+        public bool IsActive { get; set; }
     }
 }

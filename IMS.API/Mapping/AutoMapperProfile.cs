@@ -10,6 +10,7 @@ namespace IMS.API.Mapping
         {
             CreateMap<RegisterDTO, User>();
             CreateMap<User, UserDTO>();
+            CreateMap<User, AdminUserDTO>();
         }
     }
 }

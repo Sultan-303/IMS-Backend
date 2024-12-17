@@ -85,5 +85,55 @@ namespace IMS.BLL.Services
 
             return _mapper.Map<UserDTO>(user);
         }
+
+        public async Task<IEnumerable<AdminUserDTO>> GetAllUsersAsync()
+        {
+            var users = await _authRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<AdminUserDTO>>(users);
+        }
+
+        public async Task DeleteUserAsync(int id)
+        {
+            var user = await _authRepository.GetByIdAsync(id);
+            if (user == null)
+                throw new InvalidOperationException("User not found");
+
+            await _authRepository.DeleteAsync(id);
+        }
+
+        public async Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto)
+        {
+        if (updateDto == null)
+            throw new ArgumentNullException(nameof(updateDto));
+
+        var user = await _authRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new InvalidOperationException($"User with ID {id} not found");
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != user.Username)
+        {
+            if (await _authRepository.UsernameExistsAsync(updateDto.Username))
+                throw new InvalidOperationException("Username already exists");
+            user.Username = updateDto.Username;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != user.Email)
+        {
+            if (await _authRepository.EmailExistsAsync(updateDto.Email))
+                throw new InvalidOperationException("Email already exists");
+            user.Email = updateDto.Email;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Password))
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.Password);
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Role))
+            user.Role = updateDto.Role;
+
+        user.IsActive = updateDto.IsActive;
+
+        await _authRepository.UpdateAsync(user);
+        return _mapper.Map<UserDTO>(user);
+        }
     }
 }

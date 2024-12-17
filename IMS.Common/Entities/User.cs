@@ -21,5 +21,7 @@ namespace IMS.Common.Entities
         public string Role { get; set; }  // Admin, Worker, Viewer
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsActive { get; set; } = true;
+        public DateTime? LastLogin { get; set; }
     }
 }
