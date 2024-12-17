@@ -4,6 +4,7 @@ using IMS.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IMS.DAL.Migrations
 {
     [DbContext(typeof(IMSContext))]
-    partial class IMSContextModelSnapshot : ModelSnapshot
+    [Migration("20241217145548_SeedAdminUser")]
+    partial class SeedAdminUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,12 +123,6 @@ namespace IMS.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -147,10 +144,9 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 12, 17, 17, 0, 41, 65, DateTimeKind.Utc).AddTicks(7768),
+                            CreatedAt = new DateTime(2024, 12, 17, 14, 55, 48, 15, DateTimeKind.Utc).AddTicks(6098),
                             Email = "admin@ims.com",
-                            IsActive = true,
-                            PasswordHash = "$2a$11$wklEzO1dxjqeTZYrK1vmQeuSYZDtRo2HXi7BKSiZjMd7AjisLuo3q",
+                            PasswordHash = "$2a$11$j0b//8OhaglewulRGzGs3.rTCFh3qgrQQKk/De3iNLz7vIYB6ym3i",
                             Role = "Admin",
                             Username = "admin"
                         });

@@ -4,6 +4,7 @@ using IMS.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IMS.DAL.Migrations
 {
     [DbContext(typeof(IMSContext))]
-    partial class IMSContextModelSnapshot : ModelSnapshot
+    [Migration("20241217151818_AddUserActiveAndLastLogin")]
+    partial class AddUserActiveAndLastLogin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,10 +150,10 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 12, 17, 17, 0, 41, 65, DateTimeKind.Utc).AddTicks(7768),
+                            CreatedAt = new DateTime(2024, 12, 17, 15, 18, 18, 118, DateTimeKind.Utc).AddTicks(7724),
                             Email = "admin@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$wklEzO1dxjqeTZYrK1vmQeuSYZDtRo2HXi7BKSiZjMd7AjisLuo3q",
+                            PasswordHash = "$2a$11$V.KcsHW93JpUokmFNithseKjswiIi7rWY6u1b4ZWstVM6JM5E0jWu",
                             Role = "Admin",
                             Username = "admin"
                         });
