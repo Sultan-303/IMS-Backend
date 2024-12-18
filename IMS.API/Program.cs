@@ -150,7 +150,10 @@ if (app.Environment.IsDevelopment())
 // Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpLogging();  // Before CORS and routing
-app.UseCors("AllowReactApp");
+app.UseCors(options => options
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();

@@ -37,11 +37,21 @@ namespace IMS.API.Controllers
         }
 
         [HttpPut("users/{id}")]
-        public async Task<ActionResult<UserDTO>> UpdateUser(int id, UpdateUserDTO updateDto)
-        {
-            var updatedUser = await _authService.UpdateUserAsync(id, updateDto);
-            return Ok(updatedUser);
-        }
+public async Task<ActionResult<UserDTO>> UpdateUser(int id, [FromBody] UpdateUserDTO updateDto)
+{
+    try 
+    {
+        Console.WriteLine($"Updating user {id} with data: {System.Text.Json.JsonSerializer.Serialize(updateDto)}");
+        var updatedUser = await _authService.UpdateUserAsync(id, updateDto);
+        return Ok(updatedUser);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Update error: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        return BadRequest(new { message = ex.Message });
+    }
+}
 
         [HttpGet("dashboard")]
         public async Task<ActionResult<DashboardStatsDTO>> GetDashboardStats()
