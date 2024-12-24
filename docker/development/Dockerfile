@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -14,6 +13,8 @@ COPY ["IMS.Interfaces/IMS.Interfaces.csproj", "IMS.Interfaces/"]
 RUN dotnet restore "IMS.API/IMS.API.csproj"
 COPY . .
 WORKDIR "/src/IMS.API"
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet build "IMS.API.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
 FROM build AS publish 
@@ -23,6 +24,10 @@ RUN dotnet publish "IMS.API.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV ASPNETCORE_ENVIRONMENT=Development
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
-ENTRYPOINT ["dotnet", "IMS.API.dll"]
+COPY --from=build /root/.dotnet/tools /root/.dotnet/tools
+ENV PATH="${PATH}:/root/.dotnet/tools"
+ENTRYPOINT ["./entrypoint.sh"]

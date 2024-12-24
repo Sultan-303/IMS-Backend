@@ -1,0 +1,41 @@
+name: IMS CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Start Dev SQL Server
+      run: |
+        docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+    
+    - name: Run Tests
+      run: |
+        dotnet restore
+        dotnet build --configuration Debug
+        dotnet test --configuration Debug --no-build
+      env:
+        ConnectionStrings__DefaultConnection: Server=localhost;Database=IMS_Test;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True
+    
+  deploy-production:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build and Push Docker Images
+      run: |
+        docker-compose -f docker-compose.prod.yml build
+        docker-compose -f docker-compose.prod.yml push

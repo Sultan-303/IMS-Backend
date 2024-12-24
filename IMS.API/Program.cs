@@ -95,10 +95,41 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // Configure DbContext
 builder.Services.AddDbContext<IMSContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("IMS.DAL")
-    ));
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine($"Using connection string: {connectionString}"); // Debug connection
+
+    options.UseSqlServer(connectionString,
+        sqlOptions => 
+        {
+            sqlOptions.MigrationsAssembly("IMS.DAL");
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
+    
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+});
+        
+// CORS for development/production
+var corsOrigins = builder.Environment.IsDevelopment() 
+    ? new[] { "http://localhost:3000" }
+    : new[] { "your-production-url" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder => builder
+            .WithOrigins(corsOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
