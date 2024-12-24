@@ -11,31 +11,19 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
     
-    - name: Start Dev SQL Server
+    - name: Setup SQL Server Express
       shell: pwsh
       run: |
-        docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourStrong@Passw0rd" -p 1433:1433 -d mcr.microsoft.com/azure-sql-edge
-        Start-Sleep -s 30  # Wait for SQL Server to start
-        
-        # Verify SQL Server is running
-        docker ps
-        
-        # Test connection
-        $retry = 5
-        do {
-            $retry--
-            try {
-                docker exec $(docker ps -q) /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -Q "SELECT @@VERSION"
-                break
-            } catch {
-                Start-Sleep -s 10
-            }
-        } while ($retry -gt 0)
+        choco install sql-server-express -y
+        Start-Service MSSQL$SQLEXPRESS
+        $env:ConnectionString = "Server=.\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True"
+        sqlcmd -S .\SQLEXPRESS -Q "CREATE DATABASE IMS_Test"
     
     - name: Run Tests
       run: |
@@ -43,7 +31,7 @@ jobs:
         dotnet build --configuration Debug
         dotnet test --configuration Debug --no-build
       env:
-        ConnectionStrings__DefaultConnection: Server=localhost,1433;Database=IMS_Test;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True
+        ConnectionStrings__DefaultConnection: Server=.\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True
 
     - name: Build Docker Images
       if: github.ref == 'refs/heads/main'
