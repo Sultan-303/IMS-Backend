@@ -20,10 +20,21 @@ jobs:
     - name: Setup SQL Server Express
       shell: pwsh
       run: |
-        choco install sql-server-express -y
-        Start-Service MSSQL$SQLEXPRESS
-        $env:ConnectionString = "Server=.\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True"
-        sqlcmd -S .\SQLEXPRESS -Q "CREATE DATABASE IMS_Test"
+        # Install SQL Server Express with specific parameters
+        choco install sql-server-express -y --params="'/INSTANCENAME:SQLEXPRESS'"
+        
+        # Wait for installation and verify service
+        Start-Sleep -s 30
+        Get-Service -Name *SQL* | Format-Table Name, Status
+        
+        # Start SQL Service
+        Start-Service -Name "MSSQL`$SQLEXPRESS"
+        
+        # Wait for service to be ready
+        Start-Sleep -s 10
+        
+        # Create test database
+        sqlcmd -S "(local)\SQLEXPRESS" -Q "CREATE DATABASE IMS_Test"
     
     - name: Run Tests
       run: |
@@ -31,7 +42,7 @@ jobs:
         dotnet build --configuration Debug
         dotnet test --configuration Debug --no-build
       env:
-        ConnectionStrings__DefaultConnection: Server=.\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True
+        ConnectionStrings__DefaultConnection: Server=(local)\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True
 
     - name: Build Docker Images
       if: github.ref == 'refs/heads/main'
