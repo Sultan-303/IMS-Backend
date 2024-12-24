@@ -17,23 +17,19 @@ jobs:
       with:
         dotnet-version: 8.0.x
     
+    - name: Debug Branch Info
+      run: |
+        echo "Current branch: ${{ github.ref }}"
+        echo "Is main branch? ${{ github.ref == 'refs/heads/main' }}"
+    
     - name: Setup SQL Server Express
       shell: pwsh
       run: |
-        # Install SQL Server Express with specific parameters
         choco install sql-server-express -y --params="'/INSTANCENAME:SQLEXPRESS'"
-        
-        # Wait for installation and verify service
         Start-Sleep -s 30
         Get-Service -Name *SQL* | Format-Table Name, Status
-        
-        # Start SQL Service
         Start-Service -Name "MSSQL`$SQLEXPRESS"
-        
-        # Wait for service to be ready
         Start-Sleep -s 10
-        
-        # Create test database
         sqlcmd -S "(local)\SQLEXPRESS" -Q "CREATE DATABASE IMS_Test"
     
     - name: Run Tests
@@ -44,7 +40,11 @@ jobs:
       env:
         ConnectionStrings__DefaultConnection: Server=(local)\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True
 
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v1
+      
     - name: Build Docker Images
       if: github.ref == 'refs/heads/main'
       run: |
-        docker-compose -f docker-compose.prod.yml build
+        echo "Building Docker images..."
+        docker-compose -f docker-compose.prod.yml build --progress=plain
