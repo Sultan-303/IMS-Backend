@@ -17,11 +17,6 @@ jobs:
       with:
         dotnet-version: 8.0.x
     
-    - name: Debug Branch Info
-      run: |
-        echo "Current branch: ${{ github.ref }}"
-        echo "Is main branch? ${{ github.ref == 'refs/heads/main' }}"
-    
     - name: Setup SQL Server Express
       shell: pwsh
       run: |
@@ -40,11 +35,16 @@ jobs:
       env:
         ConnectionStrings__DefaultConnection: Server=(local)\SQLEXPRESS;Database=IMS_Test;Trusted_Connection=True;TrustServerCertificate=True
 
-    - name: Set up Docker
-      uses: docker/setup-buildx-action@v1
-      
+    - name: Configure Docker
+      run: |
+        docker version
+        docker context ls
+        docker switch windows
+        docker info
+    
     - name: Build Docker Images
       if: github.ref == 'refs/heads/main'
+      shell: pwsh
       run: |
-        echo "Building Docker images..."
-        docker-compose -f docker-compose.prod.yml build --progress=plain
+        echo "Current branch: $env:GITHUB_REF"
+        docker-compose -f docker-compose.prod.yml build --no-cache
