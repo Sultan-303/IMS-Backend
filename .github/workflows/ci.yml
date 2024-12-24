@@ -2,9 +2,9 @@ name: IMS CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '**' ]
   pull_request:
-    branches: [ main ]
+    branches: [ '**' ]
 
 jobs:
   build-and-test:
