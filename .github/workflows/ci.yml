@@ -17,8 +17,11 @@ jobs:
         dotnet-version: 8.0.x
     
     - name: Start Dev SQL Server
+      shell: pwsh
       run: |
-        docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+        # Use Windows SQL Server image instead of Linux
+        docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourStrong@Passw0rd" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest-windows
+        Start-Sleep -s 30  # Wait for SQL Server to start
     
     - name: Run Tests
       run: |
@@ -26,7 +29,7 @@ jobs:
         dotnet build --configuration Debug
         dotnet test --configuration Debug --no-build
       env:
-        ConnectionStrings__DefaultConnection: Server=localhost;Database=IMS_Test;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True
+        ConnectionStrings__DefaultConnection: Server=.,1433;Database=IMS_Test;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True
     
   deploy-production:
     needs: build-and-test
