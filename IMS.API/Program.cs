@@ -1,3 +1,4 @@
+using DotNetEnv;
 using IMS.DAL;
 using IMS.DAL.Repositories;
 using IMS.BLL.Services;
@@ -11,6 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load environment variables from .env file
+Env.Load();
 
 // Add Application Insights and Logging
 builder.Services.AddApplicationInsightsTelemetry();
@@ -94,11 +98,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // Configure DbContext
+var connectionString = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("DATABASE_URL_PROD")
+    : Environment.GetEnvironmentVariable("DATABASE_URL_DEV");
+
 builder.Services.AddDbContext<IMSContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("IMS.DAL")
-    ));
+    options.UseNpgsql(connectionString));
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
