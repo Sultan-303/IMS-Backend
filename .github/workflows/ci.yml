@@ -26,7 +26,6 @@ jobs:
         ConnectionStrings__DefaultConnection: "Server=(localdb)\\MSSQLLocalDB;Database=IMS_Test;Trusted_Connection=True;"
 
   deploy-db:
-    needs: test
     if: github.ref_name == '**'
     runs-on: windows-latest
     steps:
