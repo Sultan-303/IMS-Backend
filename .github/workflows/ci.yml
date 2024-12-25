@@ -34,7 +34,9 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Install dotnet-ef tool
-        run: dotnet tool install --global dotnet-ef
+        run: |
+          dotnet tool install --global dotnet-ef
+          echo "::add-path::$(dotnet --tool-path)"
         env:
           DOTNET_ROOT: /home/runner/.dotnet
           PATH: /home/runner/.dotnet/tools:$PATH
