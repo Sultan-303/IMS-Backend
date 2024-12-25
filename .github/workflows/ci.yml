@@ -10,6 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Debug Branch Info
+      run: |
+        echo "Current branch: ${{ github.ref }}"
+        echo "Is main branch? ${{ github.ref == 'refs/heads/main' }}"
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -22,7 +27,7 @@ jobs:
 
   deploy-db:
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: github.ref_name == 'main'
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
