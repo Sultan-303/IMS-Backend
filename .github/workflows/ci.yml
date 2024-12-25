@@ -33,14 +33,15 @@ jobs:
           dotnet-version: '8.0.100-preview.7.23376.2'
       - name: Install dependencies
         run: dotnet restore
-      - name: Install dotnet-ef tool (preview version)
-        run: dotnet tool install --global dotnet-ef --version 8.0.0-preview.7.23375.2
+      - name: Install dotnet-ef
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet tool restore
+          chmod +x $HOME/.dotnet/tools/dotnet-ef
         env:
           DOTNET_ROOT: /home/runner/.dotnet
-          PATH: /home/runner/.dotnet/tools:$PATH
       - name: Apply migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          DOTNET_ROOT: /home/runner/.dotnet
-          PATH: /home/runner/.dotnet/tools:$PATH
+          PATH: ${{ env.DOTNET_ROOT }}/tools:${{ env.PATH }}
         run: dotnet ef database update
