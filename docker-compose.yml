@@ -1,21 +1,14 @@
 version: '3.8'
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2019-windows-latest
-    platform: windows
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong@Passw0rd
     ports:
       - "1433:1433"
-    networks:
-      - sql-network
-    volumes:
-      - sqldata:C:/data/mssql
-
-networks:
-  sql-network:
-    driver: nat
-
-volumes:
-  sqldata:
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -Q "SELECT 1" || exit 1
+      interval: 10s
+      retries: 10
+      timeout: 3s
