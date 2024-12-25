@@ -10,12 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Switch to Windows containers
-      shell: pwsh
-      run: |
-        & $Env:ProgramFiles\Docker\Docker\DockerCli.exe -SwitchDaemon
-        Start-Sleep -s 20
-    
     - name: Deploy Database
       shell: pwsh
       run: |
