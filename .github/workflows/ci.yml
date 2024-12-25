@@ -13,7 +13,6 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
-          # Use a .NET 8.0 preview version that matches your local environment
           dotnet-version: '8.0.100-preview.7.23376.2'
       - name: Install dependencies
         run: dotnet restore
@@ -31,7 +30,6 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
-          # Same .NET 8.0 preview version
           dotnet-version: '8.0.100-preview.7.23376.2'
       - name: Install dependencies
         run: dotnet restore
@@ -43,4 +41,6 @@ jobs:
       - name: Apply migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DOTNET_ROOT: /home/runner/.dotnet
+          PATH: /home/runner/.dotnet/tools:$PATH
         run: dotnet ef database update
