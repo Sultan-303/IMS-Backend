@@ -27,7 +27,7 @@ jobs:
 
   deploy-db:
     needs: test
-    if: github.ref_name == 'main'
+    if: github.ref_name == '**'
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
