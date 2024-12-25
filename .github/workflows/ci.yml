@@ -33,6 +33,11 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Install dependencies
         run: dotnet restore
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+        env:
+          DOTNET_ROOT: /home/runner/.dotnet
+          PATH: /home/runner/.dotnet/tools:$PATH
       - name: Apply migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
