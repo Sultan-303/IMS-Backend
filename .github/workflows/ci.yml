@@ -1,22 +1,40 @@
-name: IMS CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches: [ '**' ]
+    branches: 
+      - '**'
 
 jobs:
-  deploy-db:
-    runs-on: windows-latest
+  build-and-test:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Deploy Database
-      shell: pwsh
-      run: |
-        docker compose up -d db
-        Start-Sleep -s 45
-        docker ps
-        docker logs db
-        dotnet tool install --global dotnet-ef
-        cd IMS.API
-        dotnet ef database update --connection "Server=127.0.0.1;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;Encrypt=False"
+      - uses: actions/checkout@v2
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Run tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+        run: dotnet test
+
+  update-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Apply migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+        run: dotnet ef database update
