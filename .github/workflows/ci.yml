@@ -25,16 +25,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install Docker Compose
-      shell: pwsh
-      run: |
-        choco install docker-compose -y
-        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine")
-    
     - name: Deploy Database
       shell: pwsh
       run: |
-        docker-compose up -d db
+        docker compose up -d db
         Start-Sleep -s 30
         cd IMS.API
         dotnet ef database update --connection "Server=localhost;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
