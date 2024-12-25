@@ -13,7 +13,7 @@ jobs:
     - name: Debug Branch Info
       run: |
         echo "Current branch: ${{ github.ref }}"
-        echo "Is main branch? ${{ github.ref == 'refs/heads/main' }}"
+        echo "Branch name: ${{ github.ref_name }}"
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -26,7 +26,7 @@ jobs:
         ConnectionStrings__DefaultConnection: "Server=(localdb)\\MSSQLLocalDB;Database=IMS_Test;Trusted_Connection=True;"
 
   deploy-db:
-    if: github.ref_name == '**'
+    needs: test
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
