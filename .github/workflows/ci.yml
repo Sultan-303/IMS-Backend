@@ -14,7 +14,7 @@ jobs:
       shell: pwsh
       run: |
         docker compose up -d db
-        Start-Sleep -s 30
+        Start-Sleep -s 45
         dotnet tool install --global dotnet-ef
         cd IMS.API
-        dotnet ef database update --connection "Server=localhost;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
+        dotnet ef database update --connection "Server=.,1433;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;Encrypt=False"

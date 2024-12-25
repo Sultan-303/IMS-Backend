@@ -1,14 +1,21 @@
 version: '3.8'
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2019-windows-latest
+    platform: windows
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+      - SA_PASSWORD=YourStrong@Passw0rd
     ports:
       - "1433:1433"
+    networks:
+      - sql-network
     volumes:
-      - sqldata:/var/opt/mssql
+      - sqldata:C:/data/mssql
+
+networks:
+  sql-network:
+    driver: nat
 
 volumes:
   sqldata:
