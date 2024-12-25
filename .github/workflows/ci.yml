@@ -25,25 +25,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Verify Docker
+    - name: Install Docker Compose
       shell: pwsh
       run: |
-        docker version
-        docker-compose version
+        choco install docker-compose -y
+        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine")
     
-    - name: Stop Existing Container
-      shell: pwsh
-      run: docker-compose down
-      continue-on-error: true
-    
-    - name: Start Production Database
+    - name: Deploy Database
       shell: pwsh
       run: |
         docker-compose up -d db
         Start-Sleep -s 30
-    
-    - name: Update Production Database
-      shell: pwsh
-      run: |
         cd IMS.API
         dotnet ef database update --connection "Server=localhost;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
