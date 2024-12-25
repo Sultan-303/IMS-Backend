@@ -21,7 +21,6 @@ jobs:
         ConnectionStrings__DefaultConnection: "Server=(localdb)\\MSSQLLocalDB;Database=IMS_Test;Trusted_Connection=True;"
 
   deploy-db:
-    needs: test
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
