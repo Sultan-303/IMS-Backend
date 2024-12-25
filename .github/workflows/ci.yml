@@ -25,10 +25,17 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Switch to Windows containers
+      shell: pwsh
+      run: |
+        & $Env:ProgramFiles\Docker\Docker\DockerCli.exe -SwitchDaemon
+        Start-Sleep -s 20
+    
     - name: Deploy Database
       shell: pwsh
       run: |
         docker compose up -d db
         Start-Sleep -s 30
+        dotnet tool install --global dotnet-ef
         cd IMS.API
         dotnet ef database update --connection "Server=localhost;Database=IMS_Production;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
