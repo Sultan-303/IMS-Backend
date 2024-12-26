@@ -33,8 +33,11 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Install dependencies
         run: dotnet restore
-      - name: Install dotnet-ef
-        run: dotnet tool install --global dotnet-ef --version 8.0.1
+      - name: Install and restore dotnet-ef
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-ef --version 9.0.0
+          dotnet tool restore
         env:
           DOTNET_ROOT: /home/runner/.dotnet
       - name: Create appsettings.json
