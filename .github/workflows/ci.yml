@@ -38,7 +38,7 @@ jobs:
         env:
           DOTNET_ROOT: /home/runner/.dotnet
       - name: Apply migrations
-        working-directory: ./IMS.DAL
+        working-directory: ./IMS.API
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DOTNET_ROOT: /home/runner/.dotnet
