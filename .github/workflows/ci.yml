@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Install dotnet-ef
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 8.0.1
         env:
           DOTNET_ROOT: /home/runner/.dotnet
       - name: Create appsettings.json
