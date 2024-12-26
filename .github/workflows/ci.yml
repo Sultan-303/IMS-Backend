@@ -43,4 +43,4 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DOTNET_ROOT: /home/runner/.dotnet
           PATH: "/home/runner/.dotnet:/home/runner/.dotnet/tools:$PATH"
-        run: dotnet ef database update --project ../IMS.DAL/IMS.DAL.csproj
+        run: dotnet ef database update --project ../IMS.API/IMS.API.csproj
