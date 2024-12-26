@@ -1,7 +1,5 @@
 using IMS.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace IMS.DAL
 {
@@ -14,20 +12,6 @@ namespace IMS.DAL
         public DbSet<Category> Categories { get; set; }
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<User> Users { get; set; }
-
-    private string GetConnectionString()
-    {
-        return "Host=localhost;Database=ims_db;Username=postgres;Password=postgres";
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseNpgsql(GetConnectionString())
-                    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
