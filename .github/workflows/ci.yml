@@ -37,10 +37,17 @@ jobs:
         run: dotnet tool install --global dotnet-ef
         env:
           DOTNET_ROOT: /home/runner/.dotnet
+      - name: Create appsettings.json
+        run: |
+          echo '{
+            "ConnectionStrings": {
+              "DefaultConnection": "${{ secrets.DATABASE_URL_PROD }}"
+            }
+          }' > ./IMS.API/appsettings.json
       - name: Apply migrations
-        working-directory: ./IMS.API
+        working-directory: ./IMS.DAL
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DOTNET_ROOT: /home/runner/.dotnet
           PATH: "/home/runner/.dotnet:/home/runner/.dotnet/tools:$PATH"
-        run: dotnet ef database update --project ../IMS.API/IMS.API.csproj
+        run: dotnet ef database update --startup-project ../IMS.API/IMS.API.csproj --project ../IMS.DAL/IMS.DAL.csproj
