@@ -27,10 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up .NET
+      - name: Set up .NET SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.0.100-preview.7.23376.2'
+      - name: Set up .NET Runtime
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.0-preview.7.23375.6'
       - name: Install dependencies
         run: dotnet restore
       - name: Install dotnet-ef
@@ -43,7 +47,4 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DOTNET_ROOT: /home/runner/.dotnet
           PATH: "/home/runner/.dotnet:/home/runner/.dotnet/tools:$PATH"
-        run: |
-          echo $PATH
-          dotnet --info
-          dotnet ef database update
+        run: dotnet ef database update
