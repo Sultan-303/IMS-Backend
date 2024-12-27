@@ -97,8 +97,9 @@ namespace IMS.DAL
                 .HasColumnType("text");
 
             // Seed admin user
-            modelBuilder.Entity<User>().HasData(new User
-            {
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
                 Id = 1,
                 Username = "admin",
                 Email = "admin@ims.com",
@@ -106,7 +107,18 @@ namespace IMS.DAL
                 Role = "Admin",
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
-            });
+                },
+                new User
+                {
+                    Id = 2,
+            Username = "testuser",
+            Email = "test@ims.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123!"),
+            Role = "User",
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+                }
+                );
         }
     }
 }
