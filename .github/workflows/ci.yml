@@ -38,7 +38,9 @@ jobs:
         run: dotnet test
 
   update-production:
+    needs: build-and-test
     runs-on: ubuntu-latest
+    environment: Production
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
@@ -53,8 +55,4 @@ jobs:
       - name: Apply migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-        run: |
-          dotnet ef database update \
-            --startup-project ./IMS.API/IMS.API.csproj \
-            --project ./IMS.DAL/IMS.DAL.csproj \
-            --connection "$DATABASE_URL"
+        run: dotnet ef database update --startup-project ./IMS.API/IMS.API.csproj --project ./IMS.DAL/IMS.DAL.csproj
