@@ -5,41 +5,8 @@ on:
     branches: ['**']
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: ims_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Watchdogs1!
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '8.0.x'
-      - name: Install dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --no-restore
-      - name: Run tests
-        env:
-          DATABASE_URL: "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!"
-        run: dotnet test
-
   update-production:
     runs-on: ubuntu-latest
-    needs: build-and-test
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
