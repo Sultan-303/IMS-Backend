@@ -104,8 +104,13 @@ var connectionString = builder.Environment.IsProduction()
     : Environment.GetEnvironmentVariable("DATABASE_URL_DEV");
 
 builder.Services.AddDbContext<IMSContext>(options =>
+{
     options.UseNpgsql(connectionString)
-           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+           .ConfigureWarnings(w => 
+           {
+               w.Ignore(RelationalEventId.PendingModelChangesWarning);
+           });
+});
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

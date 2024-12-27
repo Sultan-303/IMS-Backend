@@ -1,5 +1,6 @@
 using IMS.Common.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace IMS.DAL
 {
@@ -13,14 +14,40 @@ namespace IMS.DAL
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<User> Users { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder
+                    .UseNpgsql("Host=localhost;Database=ims_db;Username=postgres;Password=postgres")
+                    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configure string properties to use text type
+            modelBuilder.Entity<Item>()
+                .Property(i => i.ItemName)
+                .HasColumnType("text");
+
+            modelBuilder.Entity<Item>()
+                .Property(i => i.Unit)
+                .HasColumnType("text");
 
             // Specify precision and scale for the Price property
             modelBuilder.Entity<Item>()
                 .Property(i => i.Price)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Category>()
+                .Property(c => c.CategoryName)
+                .HasColumnType("text");
 
             // Configure ArrivalDate and ExpiryDate properties for Stock
             modelBuilder.Entity<Stock>()
@@ -33,8 +60,8 @@ namespace IMS.DAL
 
             // Configure the relationship between Stock and Item
             modelBuilder.Entity<Stock>()
-                .HasOne(s => s.Item)                // Specify the navigation property
-                .WithMany(i => i.Stocks)            // Specify the collection navigation
+                .HasOne(s => s.Item)
+                .WithMany(i => i.Stocks)
                 .HasForeignKey(s => s.ItemID)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -52,15 +79,33 @@ namespace IMS.DAL
                 .WithMany(c => c.ItemCategories)
                 .HasForeignKey(ic => ic.CategoryID);
 
+            // Configure User string properties
+            modelBuilder.Entity<User>()
+                .Property(u => u.Username)
+                .HasColumnType("text");
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Email)
+                .HasColumnType("text");
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.PasswordHash)
+                .HasColumnType("text");
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasColumnType("text");
+
             // Seed admin user
             modelBuilder.Entity<User>().HasData(new User
             {
-              Id = 1,
-              Username = "admin",
-              Email = "admin@ims.com",
-              PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-              Role = "Admin",
-              CreatedAt = DateTime.UtcNow
+                Id = 1,
+                Username = "admin",
+                Email = "admin@ims.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                Role = "Admin",
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
             });
         }
     }

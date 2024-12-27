@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.IO;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace IMS.DAL
 {
@@ -9,13 +8,10 @@ namespace IMS.DAL
     {
         public IMSContext CreateDbContext(string[] args)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
             var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder
+                .UseNpgsql("Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!")
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
             return new IMSContext(optionsBuilder.Options);
         }
