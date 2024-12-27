@@ -12,6 +12,7 @@ namespace IMS.Common.Entities
         public string ItemName { get; set; }
 
         public string Unit { get; set; }
+        public string Description { get; set; }
 
         public decimal Price { get; set; }
 
