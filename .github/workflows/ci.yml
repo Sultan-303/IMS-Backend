@@ -38,9 +38,23 @@ jobs:
         run: dotnet test
 
   update-production:
-    needs: build-and-test
     runs-on: ubuntu-latest
     environment: Production
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ims_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Watchdogs1!
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
@@ -54,5 +68,5 @@ jobs:
           dotnet tool restore
       - name: Apply migrations
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DATABASE_URL: "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!"
         run: dotnet ef database update --startup-project ./IMS.API/IMS.API.csproj --project ./IMS.DAL/IMS.DAL.csproj
