@@ -2,12 +2,26 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches: ['**']
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ims_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Watchdogs1!
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
@@ -20,41 +34,28 @@ jobs:
         run: dotnet build --no-restore
       - name: Run tests
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+          DATABASE_URL: "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!"
         run: dotnet test
 
   update-production:
     runs-on: ubuntu-latest
+    needs: build-and-test
     steps:
       - uses: actions/checkout@v2
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.0.x'
-      - name: Install dependencies
-        run: dotnet restore
-      - name: Install and restore dotnet-ef
+      - name: Install EF Tools
         run: |
           dotnet new tool-manifest --force
           dotnet tool install dotnet-ef --version 9.0.0
           dotnet tool restore
-        env:
-          DOTNET_ROOT: /home/runner/.dotnet
-      - name: Create appsettings.json
-        run: |
-          echo '{
-            "ConnectionStrings": {
-              "DefaultConnection": "${{ secrets.DATABASE_URL_PROD }}"
-            }
-          }' > ./IMS.API/appsettings.json
       - name: Apply migrations
-        working-directory: ./IMS.DAL
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          DOTNET_ROOT: /home/runner/.dotnet
-          PATH: "/home/runner/.dotnet:/home/runner/.dotnet/tools:$PATH"
         run: |
           dotnet ef database update \
-            --startup-project ../IMS.API/IMS.API.csproj \
-            --project ../IMS.DAL/IMS.DAL.csproj \
+            --startup-project ./IMS.API/IMS.API.csproj \
+            --project ./IMS.DAL/IMS.DAL.csproj \
             --connection "$DATABASE_URL"
