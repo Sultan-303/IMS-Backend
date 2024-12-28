@@ -15,17 +15,20 @@ namespace IMS.DAL
         public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.ConfigureWarnings(warnings =>
-                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+{
+    optionsBuilder.ConfigureWarnings(warnings =>
+        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder
-                    .UseNpgsql("Host=localhost;Database=ims_db;Username=postgres;Password=postgres")
-                    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-            }
-        }
+    if (!optionsBuilder.IsConfigured)
+    {
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? 
+            "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!";
+        
+        optionsBuilder
+            .UseNpgsql(connectionString)
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,25 +103,25 @@ namespace IMS.DAL
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
-                Id = 1,
-                Username = "admin",
-                Email = "admin@ims.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-                Role = "Admin",
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true
+                    Id = 1,
+                    Username = "admin",
+                    Email = "admin@ims.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                    Role = "Admin",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
                 },
                 new User
                 {
                     Id = 2,
-            Username = "testuser",
-            Email = "test@ims.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123!"),
-            Role = "User",
-            CreatedAt = DateTime.UtcNow,
-            IsActive = true
+                    Username = "testuser",
+                    Email = "test@ims.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123!"),
+                    Role = "User",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
                 }
-                );
+            );
         }
     }
 }
