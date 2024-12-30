@@ -1,21 +1,28 @@
+version: '3.8'
+
 services:
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-windowsservercore-ltsc2022
-    platform: windows
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong@Passw0rd
+  api:
+    image: ghcr.io/sultan-303/ims-backend:latest
     ports:
-      - "1433:1433"
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - DATABASE_URL=Host=ims-postgres-server.postgres.database.azure.com;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True
     networks:
       - sql-network
-    healthcheck:
-      test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1' || EXIT 1"]
-      interval: 10s
-      retries: 10
-      timeout: 3s
-    container_name: db
-    isolation: process
+    restart: always
+    depends_on:
+      - watchtower
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --cleanup
+    restart: always
+    networks:
+      - sql-network
 
 networks:
   sql-network:
