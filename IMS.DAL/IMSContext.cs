@@ -21,12 +21,18 @@ namespace IMS.DAL
 
     if (!optionsBuilder.IsConfigured)
     {
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? 
-            "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!";
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+        Console.WriteLine($"Database Connection String: {connectionString}");
+        
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("DATABASE_URL environment variable is not set");
+        }
         
         optionsBuilder
             .UseNpgsql(connectionString)
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            .LogTo(Console.WriteLine)
+            .EnableSensitiveDataLogging();
     }
 }
 
