@@ -8,21 +8,34 @@ namespace IMS.DAL
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<IMSContext>
     {
         public IMSContext CreateDbContext(string[] args)
-{
-    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-    
-    var configuration = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddEnvironmentVariables()
-        .Build();
+    {
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        Console.WriteLine("\n=== DESIGN TIME FACTORY DEBUG ===");
+        Console.WriteLine($"DATABASE_URL found: {!string.IsNullOrEmpty(databaseUrl)}");
+        
+        if (string.IsNullOrEmpty(databaseUrl))
+        {
+            throw new InvalidOperationException("DATABASE_URL environment variable is not set");
+        }
 
-    var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
-    optionsBuilder
-        .UseNpgsql(connectionString)
-        .ConfigureWarnings(warnings =>
-            warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+        var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
+        optionsBuilder
+            .UseNpgsql(databaseUrl)
+            .ConfigureWarnings(warnings => 
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
-    return new IMSContext(optionsBuilder.Options, configuration);
-}
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                {"ConnectionStrings:DefaultConnection", databaseUrl}
+            })
+            .Build();
+
+        Console.WriteLine($"Connection string configured: {databaseUrl}");
+        Console.WriteLine("===================================\n");
+
+        return new IMSContext(optionsBuilder.Options, configuration);
+    }
     }
 }
