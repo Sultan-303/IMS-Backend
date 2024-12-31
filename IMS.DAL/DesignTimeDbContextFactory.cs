@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 
 namespace IMS.DAL
@@ -10,26 +11,18 @@ namespace IMS.DAL
 {
     var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
     
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddJsonFile($"appsettings.Development.json", optional: true)
-            .Build();
-            
-        connectionString = configuration.GetConnectionString("DefaultConnection");
-    }
-
-    Console.WriteLine("\n=== DESIGN TIME CONFIGURATION ===");
-    Console.WriteLine($"Using DATABASE_URL: {!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL"))}");
-    Console.WriteLine($"Connection String Found: {!string.IsNullOrEmpty(connectionString)}");
-    Console.WriteLine("===============================\n");
+    var configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddEnvironmentVariables()
+        .Build();
 
     var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
-    optionsBuilder.UseNpgsql(connectionString);
+    optionsBuilder
+        .UseNpgsql(connectionString)
+        .ConfigureWarnings(warnings =>
+            warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
-    return new IMSContext(optionsBuilder.Options, null);
+    return new IMSContext(optionsBuilder.Options, configuration);
 }
     }
 }
