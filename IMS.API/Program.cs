@@ -11,6 +11,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,17 +100,34 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // Configure DbContext
-var connectionString = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("DATABASE_URL_PROD")
-    : Environment.GetEnvironmentVariable("DATABASE_URL_DEV");
+// Replace environment variable section with direct configuration
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+}
+
+Console.WriteLine($"\nUsing connection string from config: {connectionString}");
+
+// Test connection
+using (var connection = new Npgsql.NpgsqlConnection(connectionString))
+{
+    try 
+    {
+        connection.Open();
+        Console.WriteLine("Database connection successful!");
+        connection.Close();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Connection failed: {ex.Message}");
+    }
+}
 
 builder.Services.AddDbContext<IMSContext>(options =>
 {
     options.UseNpgsql(connectionString)
-           .ConfigureWarnings(w => 
-           {
-               w.Ignore(RelationalEventId.PendingModelChangesWarning);
-           });
+           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 });
 
 // Add JWT Authentication
@@ -158,6 +176,11 @@ if (app.Environment.IsDevelopment())
     });
     app.UseDeveloperExceptionPage();
 }
+
+Console.WriteLine("\n=== Configuration Debug ===");
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"Connection String: {builder.Configuration.GetConnectionString("DefaultConnection")}");
+Console.WriteLine("=========================\n");
 
 // Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();

@@ -31,8 +31,10 @@ namespace IMS.DAL
         
         optionsBuilder
             .UseNpgsql(connectionString)
+            .EnableSensitiveDataLogging()
             .LogTo(Console.WriteLine)
-            .EnableSensitiveDataLogging();
+            .EnableServiceProviderCaching(false)
+            .UseApplicationServiceProvider(null);
     }
 }
 
