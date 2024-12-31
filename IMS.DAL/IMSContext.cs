@@ -23,36 +23,20 @@ namespace IMS.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 {
-    Console.WriteLine("\n=== DATABASE CONFIGURATION DEBUG #1 ===");
-    Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
-    Console.WriteLine($"Configuration Type: {_configuration?.GetType().Name}");
-    
-    var connectionString = _configuration?.GetConnectionString("DefaultConnection");
-    Console.WriteLine($"Connection String Found: {!string.IsNullOrEmpty(connectionString)}");
-
-    Console.WriteLine("\n=== DATABASE CONFIGURATION DEBUG #2 ===");
-    Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
-    Console.WriteLine($"Configuration Type: {_configuration?.GetType().Name}");
-
-    if (!string.IsNullOrEmpty(connectionString))
+    if (!optionsBuilder.IsConfigured)
     {
-        Console.WriteLine($"Connection String: {connectionString}");
-        optionsBuilder.UseNpgsql(connectionString);
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+            ?? _configuration?.GetConnectionString("DefaultConnection");
 
-        Console.WriteLine("\n=== DATABASE CONFIGURATION DEBUG #3 ===");
-    Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
-    Console.WriteLine($"Configuration Type: {_configuration?.GetType().Name}");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            optionsBuilder.UseNpgsql(connectionString);
+        }
     }
 
     optionsBuilder.ConfigureWarnings(warnings =>
         warnings.Ignore(RelationalEventId.PendingModelChangesWarning)
         .Ignore(RelationalEventId.MultipleCollectionIncludeWarning));
-
-        Console.WriteLine("\n=== DATABASE CONFIGURATION DEBUG #4 ===");
-    Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
-    Console.WriteLine($"Configuration Type: {_configuration?.GetType().Name}");
-        
-    Console.WriteLine("====================================\n");
 }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
