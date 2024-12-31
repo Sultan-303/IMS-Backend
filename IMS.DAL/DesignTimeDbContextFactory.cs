@@ -1,22 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace IMS.DAL
 {
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<IMSContext>
-{
-    public IMSContext CreateDbContext(string[] args)
     {
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? 
-            "Host=localhost;Database=ims_db;Username=postgres;Password=Watchdogs1!";
-            
-        var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
-        optionsBuilder
-            .UseNpgsql(connectionString)
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        public IMSContext CreateDbContext(string[] args)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddJsonFile("appsettings.Development.json", optional: true)
+                .Build();
 
-        return new IMSContext(optionsBuilder.Options);
+            var optionsBuilder = new DbContextOptionsBuilder<IMSContext>();
+            optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+
+            return new IMSContext(optionsBuilder.Options, configuration);
+        }
     }
-}
 }

@@ -1,12 +1,19 @@
 using IMS.Common.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace IMS.DAL
 {
     public class IMSContext : DbContext
     {
-        public IMSContext(DbContextOptions<IMSContext> options) : base(options) { }
+
+        private readonly IConfiguration _configuration;
+        public IMSContext(DbContextOptions<IMSContext> options, IConfiguration configuration) 
+        : base(options) 
+    {
+        _configuration = configuration;
+    }
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Stock> Stocks { get; set; }
@@ -16,26 +23,31 @@ namespace IMS.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 {
-    optionsBuilder.ConfigureWarnings(warnings =>
-        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
-
-    if (!optionsBuilder.IsConfigured)
+    Console.WriteLine("\n=== DATABASE CONFIGURATION DEBUG ===");
+    Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
+    Console.WriteLine($"Configuration Type: {_configuration?.GetType().Name}");
+    
+    var connectionString = _configuration?.GetConnectionString("DefaultConnection");
+    Console.WriteLine($"Connection String Found: {!string.IsNullOrEmpty(connectionString)}");
+    if (!string.IsNullOrEmpty(connectionString))
     {
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-        Console.WriteLine($"Database Connection String: {connectionString}");
-        
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException("DATABASE_URL environment variable is not set");
-        }
-        
-        optionsBuilder
-            .UseNpgsql(connectionString)
-            .EnableSensitiveDataLogging()
-            .LogTo(Console.WriteLine)
-            .EnableServiceProviderCaching(false)
-            .UseApplicationServiceProvider(null);
+        Console.WriteLine($"Connection String: {connectionString}");
+        optionsBuilder.UseNpgsql(connectionString);
     }
+    else
+    {
+        var envVars = Environment.GetEnvironmentVariables();
+        Console.WriteLine("\nAll Environment Variables:");
+        foreach (var key in envVars.Keys)
+        {
+            Console.WriteLine($"{key} = {envVars[key]}");
+        }
+    }
+
+    optionsBuilder.ConfigureWarnings(warnings =>
+        warnings.Ignore(RelationalEventId.MultipleCollectionIncludeWarning));
+        
+    Console.WriteLine("====================================\n");
 }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

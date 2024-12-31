@@ -100,8 +100,25 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // Configure DbContext
+
+// Debug configuration sources
+Console.WriteLine("\n=== Configuration Sources ===");
+foreach (var provider in ((IConfigurationRoot)builder.Configuration).Providers)
+{
+    Console.WriteLine($"Provider: {provider.GetType().Name}");
+}
+
+Console.WriteLine("\n**********************************");
+Console.WriteLine("*      APPLICATION STARTING      *");
+Console.WriteLine("**********************************\n");
+
 // Replace environment variable section with direct configuration
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine("\n>>>>> CONNECTION STRING CHECK <<<<<");
+Console.WriteLine($"Found: {!string.IsNullOrEmpty(connectionString)}");
+Console.WriteLine($"Value: {connectionString}");
+Console.WriteLine(">>>>> END CONNECTION STRING <<<<<\n");
+
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
@@ -109,26 +126,31 @@ if (string.IsNullOrEmpty(connectionString))
 
 Console.WriteLine($"\nUsing connection string from config: {connectionString}");
 
-// Test connection
+// Test database connectivity
 using (var connection = new Npgsql.NpgsqlConnection(connectionString))
 {
     try 
     {
         connection.Open();
-        Console.WriteLine("Database connection successful!");
-        connection.Close();
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = "SELECT version()";
+            var version = cmd.ExecuteScalar()?.ToString();
+            Console.WriteLine($"PostgreSQL Version: {version}");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Connection failed: {ex.Message}");
+        Console.WriteLine($"Connection Error: {ex.Message}");
+        throw; // Fail fast if db connection fails
     }
 }
 
 builder.Services.AddDbContext<IMSContext>(options =>
-{
     options.UseNpgsql(connectionString)
-           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-});
+           .ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning)
+                       .Ignore(RelationalEventId.MultipleCollectionIncludeWarning)));
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -165,6 +187,15 @@ builder.Services.AddHttpLogging(logging =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<IMSContext>();
+        await db.Database.MigrateAsync();
+    }
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -176,11 +207,22 @@ if (app.Environment.IsDevelopment())
     });
     app.UseDeveloperExceptionPage();
 }
+else 
+{
+    // Disable HTTPS redirection in Production/Docker
+    app.UseHsts();
+}
+
 
 Console.WriteLine("\n=== Configuration Debug ===");
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 Console.WriteLine($"Connection String: {builder.Configuration.GetConnectionString("DefaultConnection")}");
 Console.WriteLine("=========================\n");
+
+// After builder creation
+Console.WriteLine($"Content Root Path: {builder.Environment.ContentRootPath}");
+Console.WriteLine("Available Files:");
+Directory.GetFiles(builder.Environment.ContentRootPath).ToList().ForEach(f => Console.WriteLine(f));
 
 // Important: Order matters for middleware
 app.UseMiddleware<ExceptionMiddleware>();
@@ -189,7 +231,7 @@ app.UseCors(options => options
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
-app.UseHttpsRedirection();
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

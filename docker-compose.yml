@@ -1,29 +1,14 @@
-version: '3.8'
-
 services:
   api:
-    image: ghcr.io/sultan-303/ims-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONFIGURATION=Release
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      - DATABASE_URL=Host=ims-postgres-server.postgres.database.azure.com;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True
-    networks:
-      - sql-network
+      - ConnectionStrings__DefaultConnection=Host=ims-postgres-server.postgres.database.azure.com;Port=5432;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True
     restart: always
-    depends_on:
-      - watchtower
-
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30 --cleanup
-    restart: always
-    networks:
-      - sql-network
-
-networks:
-  sql-network:
-    driver: nat

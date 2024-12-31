@@ -23,7 +23,6 @@ RUN dotnet publish "IMS.API.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
-ENV DATABASE_URL="Host=ims-postgres-server.postgres.database.azure.com;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True"
 ENTRYPOINT ["dotnet", "IMS.API.dll"]
