@@ -29,23 +29,16 @@ namespace IMS.DAL
     
     var connectionString = _configuration?.GetConnectionString("DefaultConnection");
     Console.WriteLine($"Connection String Found: {!string.IsNullOrEmpty(connectionString)}");
+
     if (!string.IsNullOrEmpty(connectionString))
     {
         Console.WriteLine($"Connection String: {connectionString}");
         optionsBuilder.UseNpgsql(connectionString);
     }
-    else
-    {
-        var envVars = Environment.GetEnvironmentVariables();
-        Console.WriteLine("\nAll Environment Variables:");
-        foreach (var key in envVars.Keys)
-        {
-            Console.WriteLine($"{key} = {envVars[key]}");
-        }
-    }
 
     optionsBuilder.ConfigureWarnings(warnings =>
-        warnings.Ignore(RelationalEventId.MultipleCollectionIncludeWarning));
+        warnings.Ignore(RelationalEventId.PendingModelChangesWarning)
+        .Ignore(RelationalEventId.MultipleCollectionIncludeWarning));
         
     Console.WriteLine("====================================\n");
 }
