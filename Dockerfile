@@ -8,9 +8,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["IMS.API/IMS.API.csproj", "IMS.API/"]
 COPY ["IMS.BLL/IMS.BLL.csproj", "IMS.BLL/"]
-COPY ["IMS.Common/IMS.Common.csproj", "IMS.Common/"]
 COPY ["IMS.DAL/IMS.DAL.csproj", "IMS.DAL/"]
-COPY ["IMS.Interfaces/IMS.Interfaces.csproj", "IMS.Interfaces/"]
 RUN dotnet restore "IMS.API/IMS.API.csproj"
 COPY . .
 WORKDIR "/src/IMS.API"
