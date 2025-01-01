@@ -1,33 +1,37 @@
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
+using AutoMapper;
+using IMS.DAL.Entities;
+using IMS.BLL.DTOs.Item;
+using IMS.BLL.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IMS.DAL.Repositories
 {
     public class ItemRepository : IItemRepository
     {
         private readonly IMSContext _context;
+        private readonly IMapper _mapper;
 
-        public ItemRepository(IMSContext context)
+        public ItemRepository(IMSContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Item>> GetAllItemsAsync()
+        public async Task<IEnumerable<ItemDTO>> GetAllItemsAsync()
         {
-            return await _context.Items.ToListAsync();
+            var items = await _context.Items.ToListAsync();
+            return _mapper.Map<IEnumerable<ItemDTO>>(items);
         }
 
-        public async Task<Item> GetItemByIdAsync(int id)
+        public async Task<ItemDTO> GetItemByIdAsync(int id)
         {
-            return await _context.Items.FindAsync(id);
+            var item = await _context.Items.FindAsync(id);
+            return _mapper.Map<ItemDTO>(item);
         }
 
-        public async Task AddItemAsync(Item item)
+        public async Task AddItemAsync(ItemDTO itemDto)
         {
+            var item = _mapper.Map<Item>(itemDto);
             await _context.Items.AddAsync(item);
             await _context.SaveChangesAsync();
         }
@@ -37,8 +41,9 @@ namespace IMS.DAL.Repositories
             return await _context.Items.AnyAsync(i => i.ItemName == itemName);
         }
 
-        public async Task UpdateItemAsync(Item item)
+        public async Task UpdateItemAsync(ItemDTO itemDto)
         {
+            var item = _mapper.Map<Item>(itemDto);
             var existingItem = await _context.Items.FindAsync(item.ItemID);
             if (existingItem == null)
             {
@@ -51,7 +56,7 @@ namespace IMS.DAL.Repositories
 
         public async Task DeleteItemAsync(int id)
         {
-            var item = await GetItemByIdAsync(id);
+            var item = await _context.Items.FindAsync(id);
             if (item != null)
             {
                 _context.Items.Remove(item);

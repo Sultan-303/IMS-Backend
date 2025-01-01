@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using IMS.Interfaces.Services;
-using IMS.Common.DTOs.Auth;
-using IMS.Common.DTOs.Admin;
+using IMS.BLL.Interfaces.Services;
+using IMS.BLL.DTOs.Auth;
+using IMS.BLL.DTOs.Admin;
 using AutoMapper;
 
 

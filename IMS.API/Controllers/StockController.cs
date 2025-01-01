@@ -1,9 +1,7 @@
-﻿using IMS.Interfaces.Services;
-using IMS.Common.Models;
+﻿using IMS.BLL.Interfaces.Services;
+using IMS.BLL.DTOs.Stock;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace IMS.API.Controllers
 {
@@ -60,14 +58,14 @@ namespace IMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddStock([FromBody] StockModel stock)
+        public async Task<IActionResult> AddStock([FromBody] StockDTO stockDto)
         {
             try
             {
-                _logger.LogInformation("Adding new stock: {@Stock}", stock);
-                await _stockService.AddStockAsync(stock);
-                _logger.LogInformation("Added stock with ID: {StockID}", stock.StockID);
-                return CreatedAtAction(nameof(GetStockById), new { id = stock.StockID }, stock);
+                _logger.LogInformation("Adding new stock: {@Stock}", stockDto);
+                await _stockService.AddStockAsync(stockDto);
+                _logger.LogInformation("Added stock with ID: {StockID}", stockDto.Id);
+                return CreatedAtAction(nameof(GetStockById), new { id = stockDto.Id }, stockDto);
             }
             catch (ArgumentNullException ex)
             {
@@ -82,18 +80,18 @@ namespace IMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockModel stock)
+        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockDTO stockDto)
         {
-            if (id != stock.StockID)
+            if (id != stockDto.Id)
             {
-                _logger.LogWarning("Stock ID mismatch: {Id} != {StockID}", id, stock.StockID);
+                _logger.LogWarning("Stock ID mismatch: {Id} != {StockID}", id, stockDto.Id);
                 return BadRequest("Stock ID mismatch.");
             }
 
             try
             {
                 _logger.LogInformation("Updating stock with ID: {StockId}", id);
-                await _stockService.UpdateStockAsync(stock);
+                await _stockService.UpdateStockAsync(stockDto);
                 _logger.LogInformation("Updated stock with ID: {StockId}", id);
                 return NoContent();
             }

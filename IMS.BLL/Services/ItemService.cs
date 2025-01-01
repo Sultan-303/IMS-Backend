@@ -1,11 +1,6 @@
-using IMS.Common.Models;
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
-using IMS.Interfaces.Services;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
+using IMS.BLL.DTOs.Item;
+using IMS.BLL.Interfaces.Repositories;
+using IMS.BLL.Interfaces.Services;
 
 namespace IMS.BLL.Services
 {
@@ -18,52 +13,37 @@ namespace IMS.BLL.Services
             _itemRepository = itemRepository;
         }
 
-        public async Task<IEnumerable<ItemModel>> GetAllItemsAsync()
+        public async Task<IEnumerable<ItemDTO>> GetAllItemsAsync()
         {
-            var items = await _itemRepository.GetAllItemsAsync();
-            return items.Select(ToItemModel);
+            return await _itemRepository.GetAllItemsAsync();
         }
 
-        public async Task<ItemModel> GetItemByIdAsync(int id)
+        public async Task<ItemDTO> GetItemByIdAsync(int id)
         {
-            var item = await _itemRepository.GetItemByIdAsync(id);
-            return item == null ? null : ToItemModel(item);
+            return await _itemRepository.GetItemByIdAsync(id);
         }
 
-        public async Task AddItemAsync(ItemModel itemModel)
+        public async Task AddItemAsync(ItemDTO itemDto)
         {
-            if (itemModel == null)
-            {
-                throw new ArgumentNullException(nameof(itemModel), "Item is null.");
-            }
+            if (itemDto == null)
+                throw new ArgumentNullException(nameof(itemDto));
 
-            if (await _itemRepository.ItemNameExistsAsync(itemModel.ItemName))
-            {
-                throw new InvalidOperationException($"Item with name {itemModel.ItemName} already exists.");
-            }
+            if (await _itemRepository.ItemNameExistsAsync(itemDto.Name))
+                throw new InvalidOperationException($"Item with name {itemDto.Name} already exists.");
 
-            var item = ToItemEntity(itemModel);
-            await _itemRepository.AddItemAsync(item);
+            await _itemRepository.AddItemAsync(itemDto);
         }
 
-        public async Task UpdateItemAsync(ItemModel itemModel)
+        public async Task UpdateItemAsync(ItemDTO itemDto)
         {
-            if (itemModel == null)
-            {
-                throw new ArgumentNullException(nameof(itemModel), "Item is null.");
-            }
+            if (itemDto == null)
+                throw new ArgumentNullException(nameof(itemDto));
 
-            var item = ToItemEntity(itemModel);
-            await _itemRepository.UpdateItemAsync(item);
+            await _itemRepository.UpdateItemAsync(itemDto);
         }
 
         public async Task DeleteItemAsync(int id)
         {
-            var item = await _itemRepository.GetItemByIdAsync(id);
-            if (item == null)
-            {
-                return;
-            }
             await _itemRepository.DeleteItemAsync(id);
         }
 
@@ -75,28 +55,6 @@ namespace IMS.BLL.Services
         public async Task DeleteRelatedStocksAsync(int itemId)
         {
             await _itemRepository.DeleteRelatedStocksAsync(itemId);
-        }
-
-        private ItemModel ToItemModel(Item item)
-        {
-            return new ItemModel
-            {
-                ItemID = item.ItemID,
-                ItemName = item.ItemName,
-                Unit = item.Unit,
-                Price = item.Price
-            };
-        }
-
-        private Item ToItemEntity(ItemModel itemModel)
-        {
-            return new Item
-            {
-                ItemID = itemModel.ItemID,
-                ItemName = itemModel.ItemName,
-                Unit = itemModel.Unit,
-                Price = itemModel.Price
-            };
         }
     }
 }

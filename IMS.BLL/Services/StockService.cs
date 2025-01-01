@@ -1,11 +1,6 @@
-﻿using IMS.Common.Models;
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
-using IMS.Interfaces.Services;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
+﻿using IMS.BLL.DTOs.Stock;
+using IMS.BLL.Interfaces.Repositories;
+using IMS.BLL.Interfaces.Services;
 
 namespace IMS.BLL.Services
 {
@@ -18,73 +13,35 @@ namespace IMS.BLL.Services
             _stockRepository = stockRepository;
         }
 
-        public async Task<IEnumerable<StockModel>> GetAllStockAsync()
+        public async Task<IEnumerable<StockDTO>> GetAllStockAsync()
         {
-            var stocks = await _stockRepository.GetAllStockAsync();
-            return stocks.Select(ToStockModel);
+            return await _stockRepository.GetAllStockAsync();
         }
 
-        public async Task<StockModel> GetStockByIdAsync(int id)
+        public async Task<StockDTO> GetStockByIdAsync(int id)
         {
-            var stock = await _stockRepository.GetStockByIdAsync(id);
-            return stock == null ? null : ToStockModel(stock);
+            return await _stockRepository.GetStockByIdAsync(id);
         }
 
-        public async Task AddStockAsync(StockModel stockModel)
+        public async Task AddStockAsync(StockDTO stockDto)
         {
-            if (stockModel == null)
-            {
-                throw new ArgumentNullException(nameof(stockModel), "Stock is null.");
-            }
+            if (stockDto == null)
+                throw new ArgumentNullException(nameof(stockDto));
 
-            var stock = ToStockEntity(stockModel);
-            await _stockRepository.AddStockAsync(stock);
+            await _stockRepository.AddStockAsync(stockDto);
         }
 
-        public async Task UpdateStockAsync(StockModel stockModel)
+        public async Task UpdateStockAsync(StockDTO stockDto)
         {
-            if (stockModel == null)
-            {
-                throw new ArgumentNullException(nameof(stockModel), "Stock is null.");
-            }
+            if (stockDto == null)
+                throw new ArgumentNullException(nameof(stockDto));
 
-            var stock = ToStockEntity(stockModel);
-            await _stockRepository.UpdateStockAsync(stock);
+            await _stockRepository.UpdateStockAsync(stockDto);
         }
 
         public async Task DeleteStockAsync(int id)
         {
-            var stock = await _stockRepository.GetStockByIdAsync(id);
-            if (stock == null)
-            {
-                return; // Do nothing if the stock is not found
-            }
-
             await _stockRepository.DeleteStockAsync(id);
-        }
-
-        private StockModel ToStockModel(Stock stock)
-        {
-            return new StockModel
-            {
-                StockID = stock.StockID,
-                ItemID = stock.ItemID,
-                Quantity = stock.QuantityInStock,
-                ArrivalDate = stock.ArrivalDate,
-                ExpiryDate = stock.ExpiryDate ?? DateTime.MinValue
-            };
-        }
-
-        private Stock ToStockEntity(StockModel stockModel)
-        {
-            return new Stock
-            {
-                StockID = stockModel.StockID,
-                ItemID = stockModel.ItemID,
-                QuantityInStock = stockModel.Quantity,
-                ArrivalDate = stockModel.ArrivalDate,
-                ExpiryDate = stockModel.ExpiryDate
-            };
         }
     }
 }

@@ -1,8 +1,8 @@
-using IMS.Interfaces.Services;
+using IMS.BLL.Interfaces.Services;
+using IMS.BLL.DTOs.Category;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using IMS.Common.Models;
 
 namespace IMS.API.Controllers
 {
@@ -12,7 +12,6 @@ namespace IMS.API.Controllers
     {
         private readonly ICategoriesService _categoriesService;
         private readonly ILogger<CategoriesController> _logger;
-
         private const string InternalServerError = "Internal Server Error";
 
         public CategoriesController(ICategoriesService categoriesService, ILogger<CategoriesController> logger)
@@ -56,17 +55,17 @@ namespace IMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] CategoryModel category)
+        public async Task<IActionResult> AddCategory([FromBody] CategoryDTO categoryDto)
         {
             try
             {
-                if (category == null)
+                if (categoryDto == null)
                 {
                     return BadRequest("Category is null.");
                 }
 
-                await _categoriesService.AddCategoryAsync(category);
-                return CreatedAtAction(nameof(GetCategoryById), new { id = category.CategoryID }, category);
+                await _categoriesService.AddCategoryAsync(categoryDto);
+                return CreatedAtAction(nameof(GetCategoryById), new { id = categoryDto.Id }, categoryDto);
             }
             catch (Exception ex)
             {
@@ -76,11 +75,11 @@ namespace IMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryModel category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
         {
             try
             {
-                if (category == null || category.CategoryID != id)
+                if (categoryDto == null || categoryDto.Id != id)
                 {
                     return BadRequest("Category is null or ID mismatch.");
                 }
@@ -91,7 +90,7 @@ namespace IMS.API.Controllers
                     return NotFound();
                 }
 
-                await _categoriesService.UpdateCategoryAsync(category);
+                await _categoriesService.UpdateCategoryAsync(categoryDto);
                 return NoContent();
             }
             catch (Exception ex)

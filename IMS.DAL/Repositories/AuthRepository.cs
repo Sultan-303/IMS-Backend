@@ -1,5 +1,7 @@
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
+using AutoMapper;
+using IMS.BLL.DTOs.Auth;
+using IMS.DAL.Entities;
+using IMS.BLL.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace IMS.DAL.Repositories
@@ -7,96 +9,91 @@ namespace IMS.DAL.Repositories
     public class AuthRepository : IAuthRepository
     {
         private readonly IMSContext _context;
+        private readonly IMapper _mapper;
 
-        public AuthRepository(IMSContext context)
+        public AuthRepository(IMSContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<User> CreateAsync(User user)
+        public async Task<UserDTO> CreateAsync(RegisterDTO registerDto)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            
+            var user = _mapper.Map<User>(registerDto);
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
-            return user;
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<UserDTO> GetByIdAsync(int id)
         {
-            return await _context.Users.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
+        public async Task<UserDTO> GetByUsernameAsync(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-                throw new ArgumentException("Username cannot be empty", nameof(username));
-
-            return await _context.Users
+            var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == username);
+            return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<bool> UsernameExistsAsync(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-                throw new ArgumentException("Username cannot be empty", nameof(username));
-
-            return await _context.Users
-                .AnyAsync(u => u.Username == username);
+            return await _context.Users.AnyAsync(u => u.Username == username);
         }
 
         public async Task<bool> EmailExistsAsync(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty", nameof(email));
-
-            return await _context.Users
-                .AnyAsync(u => u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
-          {
-        return await _context.Users.ToListAsync();
-         }
-
-         public async Task DeleteAsync(int id)
-         {
-        var user = await GetByIdAsync(id);
-        if (user != null)
+        public async Task<IEnumerable<AdminUserDTO>> GetAllAsync()
         {
-            _context.Users.Remove(user);
+            var users = await _context.Users.ToListAsync();
+            return _mapper.Map<IEnumerable<AdminUserDTO>>(users);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateAsync(UpdateUserDTO updateUserDto)
+        {
+            var user = _mapper.Map<User>(updateUserDto);
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
-          }
 
-        public async Task UpdateAsync(User user)
+        public async Task<IEnumerable<AdminUserDTO>> SearchUsersAsync(string searchTerm, string role, bool? isActive)
         {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-        }
+            var query = _context.Users.AsQueryable();
 
-        public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm, string role, bool? isActive)
-        {
-        var query = _context.Users.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(u => 
+                    u.Username.Contains(searchTerm) || 
+                    u.Email.Contains(searchTerm));
+            }
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            query = query.Where(u => 
-                u.Username.Contains(searchTerm) || 
-                u.Email.Contains(searchTerm));
-        }
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                query = query.Where(u => u.Role == role);
+            }
 
-        if (!string.IsNullOrWhiteSpace(role))
-        {
-            query = query.Where(u => u.Role == role);
-        }
+            if (isActive.HasValue)
+            {
+                query = query.Where(u => u.IsActive == isActive.Value);
+            }
 
-        if (isActive.HasValue)
-        {
-            query = query.Where(u => u.IsActive == isActive.Value);
-        }
-
-        return await query.ToListAsync();
+            var users = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<AdminUserDTO>>(users);
         }
     }
 }

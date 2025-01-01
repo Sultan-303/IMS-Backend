@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using IMS.Common.DTOs.Auth;
-using IMS.Interfaces.Services;
+using IMS.BLL.DTOs.Auth;
+using IMS.BLL.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace IMS.API.Controllers

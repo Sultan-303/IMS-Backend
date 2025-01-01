@@ -1,4 +1,4 @@
-using IMS.Common.Entities;
+using IMS.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;

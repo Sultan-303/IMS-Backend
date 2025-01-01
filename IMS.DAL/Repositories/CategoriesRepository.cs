@@ -1,40 +1,46 @@
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
+using AutoMapper;
+using IMS.DAL.Entities;
+using IMS.BLL.DTOs.Category;
+using IMS.BLL.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace IMS.DAL.Repositories
 {
     public class CategoriesRepository : ICategoriesRepository
     {
         private readonly IMSContext _context;
+        private readonly IMapper _mapper;
 
-        public CategoriesRepository(IMSContext context)
+        public CategoriesRepository(IMSContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+            return _mapper.Map<IEnumerable<CategoryDTO>>(categories);
         }
 
-        public async Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<CategoryDTO> GetCategoryByIdAsync(int id)
         {
-            var category = await _context.Categories.FindAsync(id) ?? throw new KeyNotFoundException($"Category with id {id} not found.");
-            return category;
+            var category = await _context.Categories.FindAsync(id) 
+                ?? throw new KeyNotFoundException($"Category with id {id} not found.");
+            return _mapper.Map<CategoryDTO>(category);
         }
 
-        public async Task AddCategoryAsync(Category category)
+        public async Task AddCategoryAsync(CategoryDTO categoryDto)
         {
-            await _context.Set<IMS.Common.Entities.Category>().AddAsync(category);
+            var category = _mapper.Map<Category>(categoryDto);
+            await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task UpdateCategoryAsync(CategoryDTO categoryDto)
         {
-            _context.Set<IMS.Common.Entities.Category>().Update(category);
+            var category = _mapper.Map<Category>(categoryDto);
+            _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
 

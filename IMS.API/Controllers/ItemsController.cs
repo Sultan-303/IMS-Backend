@@ -1,6 +1,7 @@
-using IMS.Interfaces.Services;
-using IMS.Common.Models;
+using IMS.BLL.Interfaces.Services;
+using IMS.BLL.DTOs.Item;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace IMS.API.Controllers
 {
@@ -10,7 +11,6 @@ namespace IMS.API.Controllers
     {
         private readonly IItemService _itemService;
         private readonly ILogger<ItemsController> _logger;
-
         private const string InternalServerError = "Internal server error";
 
         public ItemsController(IItemService itemService, ILogger<ItemsController> logger)
@@ -59,20 +59,20 @@ namespace IMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] ItemModel item)
+        public async Task<IActionResult> AddItem([FromBody] ItemDTO itemDto)
         {
-            if (item == null)
+            if (itemDto == null)
             {
                 _logger.LogWarning("AddItem called with null item");
                 return BadRequest("Item is null.");
             }
 
-            _logger.LogInformation("Adding new item: {ItemName}", item.ItemName);
+            _logger.LogInformation("Adding new item: {ItemName}", itemDto.Name);
             try
             {
-                await _itemService.AddItemAsync(item);
-                _logger.LogInformation("Successfully added item: {ItemName}", item.ItemName);
-                return CreatedAtAction(nameof(GetItemById), new { id = item.ItemID }, item);
+                await _itemService.AddItemAsync(itemDto);
+                _logger.LogInformation("Successfully added item: {ItemName}", itemDto.Name);
+                return CreatedAtAction(nameof(GetItemById), new { id = itemDto.Id }, itemDto);
             }
             catch (ArgumentNullException ex)
             {
@@ -86,21 +86,21 @@ namespace IMS.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while adding item: {ItemName}", item.ItemName);
+                _logger.LogError(ex, "Error occurred while adding item: {ItemName}", itemDto.Name);
                 return StatusCode(500, InternalServerError);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, [FromBody] ItemModel item)
+        public async Task<IActionResult> UpdateItem(int id, [FromBody] ItemDTO itemDto)
         {
-            if (item == null)
+            if (itemDto == null)
             {
                 _logger.LogWarning("UpdateItem called with null item");
                 return BadRequest("Item cannot be null.");
             }
 
-            if (id != item.ItemID)
+            if (id != itemDto.Id)
             {
                 _logger.LogWarning("UpdateItem called with mismatched item ID: {ItemId}", id);
                 return BadRequest("Item ID mismatch.");
@@ -116,7 +116,7 @@ namespace IMS.API.Controllers
                     return NotFound();
                 }
 
-                await _itemService.UpdateItemAsync(item);
+                await _itemService.UpdateItemAsync(itemDto);
                 _logger.LogInformation("Successfully updated item with ID: {ItemId}", id);
                 return NoContent();
             }
@@ -145,7 +145,6 @@ namespace IMS.API.Controllers
                     return NotFound();
                 }
 
-                // Check for related records in the Stocks table
                 var hasRelatedStocks = await _itemService.HasRelatedStocksAsync(id);
                 if (hasRelatedStocks)
                 {
@@ -177,10 +176,7 @@ namespace IMS.API.Controllers
                     return NotFound();
                 }
 
-                // Delete related records in the Stocks table
                 await _itemService.DeleteRelatedStocksAsync(id);
-
-                // Delete the item
                 await _itemService.DeleteItemAsync(id);
                 _logger.LogInformation("Successfully force deleted item with ID: {ItemId}", id);
                 return NoContent();

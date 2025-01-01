@@ -1,10 +1,9 @@
 using AutoMapper;
-using IMS.Common.DTOs.Auth;
-using IMS.Common.Entities;
-using IMS.Interfaces.Repositories;
-using IMS.Interfaces.Services;
+using IMS.BLL.DTOs.Auth;
+using IMS.BLL.Interfaces.Repositories;
+using IMS.BLL.Interfaces.Services;
 using BCrypt.Net;
-using IMS.Common.DTOs.Admin;
+using IMS.BLL.DTOs.Admin;
 
 namespace IMS.BLL.Services
 {
@@ -25,43 +24,70 @@ namespace IMS.BLL.Services
         }
 
         public async Task<UserDTO> RegisterAsync(RegisterDTO registerDto)
+    {
+        if (registerDto == null)
+            throw new ArgumentNullException(nameof(registerDto));
+
+        if (string.IsNullOrWhiteSpace(registerDto.Username))
+            throw new ArgumentException("Username is required");
+
+        if (string.IsNullOrWhiteSpace(registerDto.Password))
+            throw new ArgumentException("Password is required");
+
+        if (await _authRepository.UsernameExistsAsync(registerDto.Username))
+            throw new InvalidOperationException("Username already exists");
+
+        if (await _authRepository.EmailExistsAsync(registerDto.Email))
+            throw new InvalidOperationException("Email already exists");
+
+        registerDto.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+        return await _authRepository.CreateAsync(registerDto);
+    }
+
+    public async Task<string> LoginAsync(LoginDTO loginDto)
+    {
+        if (loginDto == null)
+            throw new ArgumentNullException(nameof(loginDto));
+
+        var user = await _authRepository.GetByUsernameAsync(loginDto.Username);
+        if (user == null)
+            throw new InvalidOperationException("Invalid username or password");
+
+        if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+            throw new InvalidOperationException("Invalid username or password");
+
+        return _jwtService.GenerateToken(user.Id, user.Username, user.Role);
+    }
+
+    public async Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto)
+    {
+        if (updateDto == null)
+            throw new ArgumentNullException(nameof(updateDto));
+
+        var user = await _authRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new InvalidOperationException($"User with ID {id} not found");
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != user.Username)
         {
-            if (registerDto == null)
-                throw new ArgumentNullException(nameof(registerDto));
-
-            if (string.IsNullOrWhiteSpace(registerDto.Username))
-                throw new ArgumentException("Username is required");
-
-            if (string.IsNullOrWhiteSpace(registerDto.Password))
-                throw new ArgumentException("Password is required");
-
-            if (await _authRepository.UsernameExistsAsync(registerDto.Username))
+            if (await _authRepository.UsernameExistsAsync(updateDto.Username))
                 throw new InvalidOperationException("Username already exists");
-
-            if (await _authRepository.EmailExistsAsync(registerDto.Email))
-                throw new InvalidOperationException("Email already exists");
-
-            var user = _mapper.Map<User>(registerDto);
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
-
-            var createdUser = await _authRepository.CreateAsync(user);
-            return _mapper.Map<UserDTO>(createdUser);
         }
 
-        public async Task<string> LoginAsync(LoginDTO loginDto)
+        if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != user.Email)
         {
-            if (loginDto == null)
-                throw new ArgumentNullException(nameof(loginDto));
-
-            var user = await _authRepository.GetByUsernameAsync(loginDto.Username);
-            if (user == null)
-                throw new InvalidOperationException("Invalid username or password");
-
-            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
-                throw new InvalidOperationException("Invalid username or password");
-
-            return _jwtService.GenerateToken(user.Id, user.Username, user.Role);
+            if (await _authRepository.EmailExistsAsync(updateDto.Email))
+                throw new InvalidOperationException("Email already exists");
         }
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Password))
+        {
+            updateDto.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.Password);
+        }
+
+        await _authRepository.UpdateAsync(updateDto);
+        return await _authRepository.GetByIdAsync(id);
+    }
 
         public async Task<UserDTO> GetUserByIdAsync(int id)
         {
@@ -100,41 +126,6 @@ namespace IMS.BLL.Services
                 throw new InvalidOperationException("User not found");
 
             await _authRepository.DeleteAsync(id);
-        }
-
-        public async Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto)
-        {
-        if (updateDto == null)
-            throw new ArgumentNullException(nameof(updateDto));
-
-        var user = await _authRepository.GetByIdAsync(id);
-        if (user == null)
-            throw new InvalidOperationException($"User with ID {id} not found");
-
-        if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != user.Username)
-        {
-            if (await _authRepository.UsernameExistsAsync(updateDto.Username))
-                throw new InvalidOperationException("Username already exists");
-            user.Username = updateDto.Username;
-        }
-
-        if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != user.Email)
-        {
-            if (await _authRepository.EmailExistsAsync(updateDto.Email))
-                throw new InvalidOperationException("Email already exists");
-            user.Email = updateDto.Email;
-        }
-
-        if (!string.IsNullOrWhiteSpace(updateDto.Password))
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.Password);
-
-        if (!string.IsNullOrWhiteSpace(updateDto.Role))
-            user.Role = updateDto.Role;
-
-        user.IsActive = updateDto.IsActive;
-
-        await _authRepository.UpdateAsync(user);
-        return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<DashboardStatsDTO> GetDashboardStatsAsync()
