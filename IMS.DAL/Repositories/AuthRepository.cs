@@ -65,11 +65,14 @@ namespace IMS.DAL.Repositories
         }
 
         public async Task UpdateAsync(UpdateUserDTO updateUserDto)
-        {
-            var user = _mapper.Map<User>(updateUserDto);
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-        }
+{
+    var user = await _context.Users.FindAsync(updateUserDto.Id);
+    if (user == null)
+        throw new KeyNotFoundException($"User with ID {updateUserDto.Id} not found");
+
+    _mapper.Map(updateUserDto, user);
+    await _context.SaveChangesAsync();
+}
 
         public async Task<IEnumerable<AdminUserDTO>> SearchUsersAsync(string searchTerm, string role, bool? isActive)
         {

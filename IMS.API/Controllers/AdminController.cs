@@ -41,7 +41,7 @@ public async Task<ActionResult<UserDTO>> UpdateUser(int id, [FromBody] UpdateUse
 {
     try 
     {
-        Console.WriteLine($"Updating user {id} with data: {System.Text.Json.JsonSerializer.Serialize(updateDto)}");
+        updateDto.Id = id;  // Set the Id from route parameter
         var updatedUser = await _authService.UpdateUserAsync(id, updateDto);
         return Ok(updatedUser);
     }

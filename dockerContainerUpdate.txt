@@ -1,0 +1,21 @@
+---UPDATE DOCKER AFTER SUCCESSFUL PIPELINE RUN---
+# Pull and update from GitHub Container Registry
+docker pull ghcr.io/sultan-303/ims-backend:latest
+docker stop ims-backend-api
+docker rm ims-backend-api
+docker run -d `
+    --name ims-backend-api `
+    -p 8080:8080 `
+    --restart unless-stopped `
+    ghcr.io/sultan-303/ims-backend:latest
+
+---UPDATE DOCKER WITHOUT RUNNING PIPELINE---
+# Build and update locally
+docker build -t ims-backend:local .
+docker stop ims-backend-api
+docker rm ims-backend-api
+docker run -d `
+    --name ims-backend-api `
+    -p 8080:8080 `
+    --restart unless-stopped `
+    ims-backend:local
