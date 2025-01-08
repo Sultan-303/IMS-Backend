@@ -1,0 +1,24 @@
+services:
+  ims-api-dev:
+    build: .
+    ports:
+      - "5079:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres-dev;Database=ims_dev;Username=postgres;Password=postgres
+    depends_on:
+      - postgres-dev
+
+  postgres-dev:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=ims_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-dev-data:
