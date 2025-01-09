@@ -1,4 +1,5 @@
 using IMS.BLL.DTOs.Item;
+using IMS.BLL.DTOs.ClientDashboard;
 
 namespace IMS.BLL.Interfaces.Repositories
 {
@@ -12,5 +13,6 @@ namespace IMS.BLL.Interfaces.Repositories
         Task<bool> ItemNameExistsAsync(string itemName);
         Task<bool> HasRelatedStocksAsync(int itemId);
         Task DeleteRelatedStocksAsync(int itemId);
+        Task<ClientDashboardStatsDTO> GetClientDashboardStatsAsync(string? searchQuery, int userId);
     }
 }

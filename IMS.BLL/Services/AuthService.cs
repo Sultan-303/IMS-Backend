@@ -141,11 +141,11 @@ namespace IMS.BLL.Services
             await _authRepository.DeleteAsync(id);
         }
 
-        public async Task<DashboardStatsDTO> GetDashboardStatsAsync()
+        public async Task<AdminDashboardStatsDTO> GetAdminDashboardStatsAsync()
     {
         var users = await _authRepository.GetAllAsync();
         
-        return new DashboardStatsDTO
+        return new AdminDashboardStatsDTO
         {
             TotalUsers = users.Count(),
             UsersByRole = users.GroupBy(u => u.Role)

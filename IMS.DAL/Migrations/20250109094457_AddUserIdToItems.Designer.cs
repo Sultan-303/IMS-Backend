@@ -3,6 +3,7 @@ using System;
 using IMS.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.DAL.Migrations
 {
     [DbContext(typeof(IMSContext))]
-    partial class IMSContextModelSnapshot : ModelSnapshot
+    [Migration("20250109094457_AddUserIdToItems")]
+    partial class AddUserIdToItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,10 +95,10 @@ namespace IMS.DAL.Migrations
                         {
                             ItemID = 1,
                             Category = "Electronics",
-                            CreatedAt = new DateTime(2025, 1, 8, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(9886),
+                            CreatedAt = new DateTime(2025, 1, 8, 9, 44, 56, 951, DateTimeKind.Utc).AddTicks(4433),
                             Description = "Test item with low stock",
-                            ExpiryDate = new DateTime(2025, 1, 14, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(9663),
-                            ItemName = "Low Stock Item",
+                            ExpiryDate = new DateTime(2025, 1, 14, 9, 44, 56, 951, DateTimeKind.Utc).AddTicks(4213),
+                            ItemName = "Low Stock Item 1",
                             MinimumStockQuantity = 10,
                             Price = 10.99m,
                             StockQuantity = 5,
@@ -106,10 +109,10 @@ namespace IMS.DAL.Migrations
                         {
                             ItemID = 2,
                             Category = "Office Supplies",
-                            CreatedAt = new DateTime(2025, 1, 9, 0, 14, 40, 304, DateTimeKind.Utc).AddTicks(147),
+                            CreatedAt = new DateTime(2025, 1, 9, 7, 44, 56, 951, DateTimeKind.Utc).AddTicks(4733),
                             Description = "Recently added item",
-                            ExpiryDate = new DateTime(2025, 1, 15, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(147),
-                            ItemName = "Near Expiry Item",
+                            ExpiryDate = new DateTime(2025, 2, 8, 9, 44, 56, 951, DateTimeKind.Utc).AddTicks(4732),
+                            ItemName = "New Item",
                             MinimumStockQuantity = 5,
                             Price = 15.99m,
                             StockQuantity = 20,
@@ -120,29 +123,15 @@ namespace IMS.DAL.Migrations
                         {
                             ItemID = 3,
                             Category = "Food",
-                            CreatedAt = new DateTime(2024, 12, 30, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(153),
+                            CreatedAt = new DateTime(2024, 12, 30, 9, 44, 56, 951, DateTimeKind.Utc).AddTicks(4739),
                             Description = "Item near expiry",
-                            ExpiryDate = new DateTime(2025, 1, 15, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(152),
+                            ExpiryDate = new DateTime(2025, 1, 15, 9, 44, 56, 951, DateTimeKind.Utc).AddTicks(4739),
                             ItemName = "Expiring Item",
                             MinimumStockQuantity = 5,
                             Price = 25.99m,
                             StockQuantity = 15,
                             Unit = "boxes",
                             UserId = 1
-                        },
-                        new
-                        {
-                            ItemID = 4,
-                            Category = "Electronics",
-                            CreatedAt = new DateTime(2025, 1, 8, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(155),
-                            Description = "Test item with low stock",
-                            ExpiryDate = new DateTime(2025, 1, 14, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(154),
-                            ItemName = "Low Stock Item",
-                            MinimumStockQuantity = 10,
-                            Price = 10.99m,
-                            StockQuantity = 5,
-                            Unit = "pcs",
-                            UserId = 2
                         });
                 });
 
@@ -230,20 +219,20 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 1, 9, 10, 14, 40, 209, DateTimeKind.Utc).AddTicks(3114),
+                            CreatedAt = new DateTime(2025, 1, 9, 9, 44, 56, 853, DateTimeKind.Utc).AddTicks(7621),
                             Email = "admin@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$ix.yg.3vijVTTpc4juGG6uo8Z0iF.JJHnrXDmJn7vqkljEgKdlS7W",
+                            PasswordHash = "$2a$11$E160rsbrzKHe9w6VHAN37erwhy/249eG0sWD3gwMd7YRPaM5k9/0u",
                             Role = "Admin",
                             Username = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 1, 9, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(3223),
+                            CreatedAt = new DateTime(2025, 1, 9, 9, 44, 56, 950, DateTimeKind.Utc).AddTicks(7905),
                             Email = "test@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$p/a22a.bbCTtM7bzCM867.ilTou4Ty9yFpvoYL53VZsPagHvs.r9m",
+                            PasswordHash = "$2a$11$RrWXU1Qh1qGNeEm/HOHRje6mEHDK1hlnuHg7DbBCJmfUsmZBA04l6",
                             Role = "User",
                             Username = "testuser"
                         });

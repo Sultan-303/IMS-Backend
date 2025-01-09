@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace IMS.DAL.Entities
@@ -23,5 +25,8 @@ namespace IMS.DAL.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
         public DateTime? LastLogin { get; set; }
+
+        // New Property
+        public ICollection<Item> Items { get; set; }
     }
 }

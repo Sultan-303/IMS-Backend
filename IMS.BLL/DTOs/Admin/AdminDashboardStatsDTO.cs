@@ -1,6 +1,6 @@
 namespace IMS.BLL.DTOs.Admin
 {
-    public class DashboardStatsDTO
+    public class AdminDashboardStatsDTO
     {
         public int TotalUsers { get; set; }
         public Dictionary<string, int> UsersByRole { get; set; }

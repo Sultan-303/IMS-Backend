@@ -2,11 +2,15 @@ using IMS.BLL.Interfaces.Services;
 using IMS.BLL.DTOs.Item;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using IMS.BLL.Interfaces.Repositories;
 
 namespace IMS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _itemService;

@@ -54,9 +54,9 @@ public async Task<ActionResult<UserDTO>> UpdateUser(int id, [FromBody] UpdateUse
 }
 
         [HttpGet("dashboard")]
-        public async Task<ActionResult<DashboardStatsDTO>> GetDashboardStats()
+        public async Task<ActionResult<AdminDashboardStatsDTO>> GetDashboardStats()
         {
-            var stats = await _authService.GetDashboardStatsAsync();
+            var stats = await _authService.GetAdminDashboardStatsAsync();
             return Ok(stats);
         }
 

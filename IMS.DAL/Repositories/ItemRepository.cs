@@ -3,6 +3,7 @@ using IMS.DAL.Entities;
 using IMS.BLL.DTOs.Item;
 using IMS.BLL.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using IMS.BLL.DTOs.ClientDashboard;
 
 namespace IMS.DAL.Repositories
 {
@@ -74,6 +75,58 @@ namespace IMS.DAL.Repositories
             var relatedStocks = _context.Stocks.Where(s => s.ItemID == itemId);
             _context.Stocks.RemoveRange(relatedStocks);
             await _context.SaveChangesAsync();
+        }
+
+        // File: IMS.DAL/Repositories/ItemRepository.cs
+
+        public async Task<ClientDashboardStatsDTO> GetClientDashboardStatsAsync(string? searchQuery, int userId)
+        {
+            var now = DateTime.UtcNow;
+            var sevenDaysFromNow = now.AddDays(7);
+            var twentyFourHoursAgo = now.AddHours(-24);
+
+            var itemsQuery = _context.Items
+                .AsNoTracking()
+                .Where(i => i.UserId == userId)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                itemsQuery = itemsQuery.Where(i => i.ItemName.Contains(searchQuery) || i.Category.Contains(searchQuery));
+            }
+
+            var items = await itemsQuery.ToListAsync();
+
+            var lowStockItems = items
+                .Where(i => i.StockQuantity <= i.MinimumStockQuantity)
+                .Select(i => new LowStockItemDTO
+                {
+                    Id = i.ItemID,
+                    ProductName = i.ItemName,
+                    CurrentStock = i.StockQuantity,
+                    Category = i.Category
+                })
+                .ToList();
+
+            var nearExpiryItems = items
+                .Where(i => i.ExpiryDate.HasValue && i.ExpiryDate.Value <= sevenDaysFromNow)
+                .Select(i => new NearExpiryItemDTO
+                {
+                    Id = i.ItemID,
+                    ProductName = i.ItemName,
+                    ExpiryDate = i.ExpiryDate.Value,
+                    Category = i.Category
+                })
+                .ToList();
+
+            return new ClientDashboardStatsDTO
+            {
+                LowStockItemsCount = lowStockItems.Count,
+                NearExpiryItemsCount = nearExpiryItems.Count,
+                NewItemsCount = items.Count(i => i.CreatedAt >= twentyFourHoursAgo),
+                LowStockItems = lowStockItems,
+                NearExpiryItems = nearExpiryItems
+            };
         }
     }
 }

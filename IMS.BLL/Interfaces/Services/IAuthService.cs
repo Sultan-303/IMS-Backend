@@ -12,7 +12,7 @@ namespace IMS.BLL.Interfaces.Services
         Task<IEnumerable<AdminUserDTO>> GetAllUsersAsync();
         Task DeleteUserAsync(int id);
         Task<UserDTO> UpdateUserAsync(int id, UpdateUserDTO updateDto);
-        Task<DashboardStatsDTO> GetDashboardStatsAsync();
+        Task<AdminDashboardStatsDTO> GetAdminDashboardStatsAsync();
         Task<IEnumerable<UserDTO>> SearchUsersAsync(string searchTerm, string role, bool? isActive);
     }
 }

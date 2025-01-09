@@ -9,7 +9,7 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push:
+  Build-Docker-Image-And-Push-To-GHCR:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,6 +31,7 @@ jobs:
             DATABASE_URL=${{ secrets.AZURE_POSTGRES_CONNECTION_STRING }}
 
   update-production:
+    needs: Build-Docker-Image-And-Push-To-GHCR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

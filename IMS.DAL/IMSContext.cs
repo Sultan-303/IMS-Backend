@@ -108,7 +108,13 @@ namespace IMS.DAL
                 .Property(u => u.Role)
                 .HasColumnType("text");
 
-            // Seed admin user
+            // Configure one-to-many relationship between User and Item
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.User)
+                .WithMany(u => u.Items)
+                .HasForeignKey(i => i.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -129,6 +135,153 @@ namespace IMS.DAL
                     Role = "User",
                     CreatedAt = DateTime.UtcNow,
                     IsActive = true
+                }
+            );
+
+            // Seed Items
+            modelBuilder.Entity<Item>().HasData(
+                // Admin's Items
+                new Item
+                {
+                    ItemID = 1,
+                    ItemName = "Admin Near Expiry Item 1",
+                    Unit = "pcs",
+                    Description = "Admin item nearing expiry",
+                    Price = 20.99m,
+                    StockQuantity = 15,
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(5), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-10),
+                    Category = "Electronics",
+                    UserId = 1
+                },
+                new Item
+                {
+                    ItemID = 2,
+                    ItemName = "Admin Low Stock Item 1",
+                    Unit = "pcs",
+                    Description = "Admin item with low stock",
+                    Price = 5.99m,
+                    StockQuantity = 3, // Low Stock
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(30),
+                    CreatedAt = DateTime.UtcNow.AddDays(-5),
+                    Category = "Office Supplies",
+                    UserId = 1
+                },
+                new Item
+                {
+                    ItemID = 3,
+                    ItemName = "Admin Near Expiry & Low Stock Item",
+                    Unit = "boxes",
+                    Description = "Admin item near expiry and low stock",
+                    Price = 15.99m,
+                    StockQuantity = 2, // Low Stock
+                    MinimumStockQuantity = 5,
+                    ExpiryDate = DateTime.UtcNow.AddDays(4), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-7),
+                    Category = "Food",
+                    UserId = 1
+                },
+                new Item
+                {
+                    ItemID = 4,
+                    ItemName = "Admin Near Expiry Item 2",
+                    Unit = "pcs",
+                    Description = "Another admin item nearing expiry",
+                    Price = 12.99m,
+                    StockQuantity = 20,
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(6), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    Category = "Garden Supplies",
+                    UserId = 1
+                },
+                new Item
+                {
+                    ItemID = 5,
+                    ItemName = "Admin Low Stock Item 2",
+                    Unit = "pcs",
+                    Description = "Another admin item with low stock",
+                    Price = 7.99m,
+                    StockQuantity = 4, // Low Stock
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(25),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    Category = "Cleaning Supplies",
+                    UserId = 1
+                },
+
+                // TestUser's Items
+                new Item
+                {
+                    ItemID = 6,
+                    ItemName = "TestUser Near Expiry Item 1",
+                    Unit = "pcs",
+                    Description = "TestUser item nearing expiry",
+                    Price = 18.99m,
+                    StockQuantity = 25,
+                    MinimumStockQuantity = 15,
+                    ExpiryDate = DateTime.UtcNow.AddDays(3), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-8),
+                    Category = "Electronics",
+                    UserId = 2
+                },
+                new Item
+                {
+                    ItemID = 7,
+                    ItemName = "TestUser Low Stock Item 1",
+                    Unit = "pcs",
+                    Description = "TestUser item with low stock",
+                    Price = 9.99m,
+                    StockQuantity = 2, // Low Stock
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(20),
+                    CreatedAt = DateTime.UtcNow.AddDays(-6),
+                    Category = "Office Supplies",
+                    UserId = 2
+                },
+                new Item
+                {
+                    ItemID = 8,
+                    ItemName = "TestUser Near Expiry & Low Stock Item",
+                    Unit = "boxes",
+                    Description = "TestUser item near expiry and low stock",
+                    Price = 14.99m,
+                    StockQuantity = 1, // Low Stock
+                    MinimumStockQuantity = 5,
+                    ExpiryDate = DateTime.UtcNow.AddDays(2), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-4),
+                    Category = "Food",
+                    UserId = 2
+                },
+                new Item
+                {
+                    ItemID = 9,
+                    ItemName = "TestUser Near Expiry Item 2",
+                    Unit = "pcs",
+                    Description = "Another TestUser item nearing expiry",
+                    Price = 11.99m,
+                    StockQuantity = 30,
+                    MinimumStockQuantity = 20,
+                    ExpiryDate = DateTime.UtcNow.AddDays(7), // Near Expiry
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    Category = "Garden Supplies",
+                    UserId = 2
+                },
+                new Item
+                {
+                    ItemID = 10,
+                    ItemName = "TestUser Low Stock Item 2",
+                    Unit = "pcs",
+                    Description = "Another TestUser item with low stock",
+                    Price = 8.99m,
+                    StockQuantity = 5, // Low Stock
+                    MinimumStockQuantity = 10,
+                    ExpiryDate = DateTime.UtcNow.AddDays(22),
+                    CreatedAt = DateTime.UtcNow.AddDays(-9),
+                    Category = "Cleaning Supplies",
+                    UserId = 2
                 }
             );
         }
