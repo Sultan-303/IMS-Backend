@@ -49,12 +49,24 @@ jobs:
           DATABASE_URL: "${{ secrets.AZURE_POSTGRES_CONNECTION_STRING }}"
         run: dotnet ef database update --project ./IMS.DAL/IMS.DAL.csproj --startup-project ./IMS.API/IMS.API.csproj
 
-  SonarQube-Scan:
+  CodeQL-Analysis:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
     steps:
-      - uses: actions/checkout@v2
-      - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'csharp'
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
