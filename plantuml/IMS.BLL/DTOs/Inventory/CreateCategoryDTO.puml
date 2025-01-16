@@ -1,0 +1,5 @@
+@startuml
+class CreateCategoryDTO {
+    + CategoryName : string <<get>> <<set>>
+}
+@enduml

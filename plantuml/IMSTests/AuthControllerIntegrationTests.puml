@@ -1,0 +1,8 @@
+@startuml
+class AuthControllerIntegrationTests {
+    + AuthControllerIntegrationTests(factory:WebApplicationFactory<Program>)
+}
+class "IClassFixture`1"<T> {
+}
+"IClassFixture`1" "<WebApplicationFactory<Program>>" <|-- AuthControllerIntegrationTests
+@enduml

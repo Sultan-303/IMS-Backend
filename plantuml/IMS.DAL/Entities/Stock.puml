@@ -1,0 +1,13 @@
+@startuml
+class Stock {
+    + StockID : int <<get>> <<set>>
+    + ItemID : int <<get>> <<set>>
+    + Quantity : int <<get>> <<set>>
+    + UserId : int <<get>> <<set>>
+}
+Stock --> "CreatedAt" DateTime
+Stock --> "ArrivalDate" DateTime
+Stock --> "ExpiryDate" DateTime
+Stock --> "Item" Item
+Stock --> "User" User
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+class UserDTO {
+    + Id : int <<get>> <<set>>
+    + Username : string <<get>> <<set>>
+    + Email : string <<get>> <<set>>
+    + Role : string <<get>> <<set>>
+    + PasswordHash : string <<get>> <<set>>
+    + IsActive : bool <<get>> <<set>>
+}
+@enduml

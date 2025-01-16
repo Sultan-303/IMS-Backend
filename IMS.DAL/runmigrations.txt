@@ -1,12 +1,14 @@
 # Creating New Migration
 cd ims.dal
-dotnet ef migrations add AddUserIdToItems --startup-project ../IMS.API/IMS.API.csproj
+dotnet ef migrations add MigrationName --startup-project ../IMS.API/IMS.API.csproj
 
 # Updating Database with New Migration
+cd ims.dal
 dotnet ef database update --startup-project ../IMS.API/IMS.API.csproj
 
 
 
 
 # Dropping Database
+cd ims.dal
 dotnet ef database drop --force --startup-project ../IMS.API/IMS.API.csproj

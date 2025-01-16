@@ -1,0 +1,5 @@
+@startuml
+class AddIdToDashboardDTOs <<partial>> {
+}
+Migration <|-- AddIdToDashboardDTOs
+@enduml

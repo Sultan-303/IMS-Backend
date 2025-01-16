@@ -1,0 +1,15 @@
+@startuml
+class AuthRepository {
+    + AuthRepository(context:IMSContext, mapper:IMapper)
+    + <<async>> CreateAsync(registerDto:RegisterDTO) : Task<UserDTO>
+    + <<async>> GetByIdAsync(id:int) : Task<UserDTO>
+    + <<async>> GetByUsernameAsync(username:string) : Task<UserDTO>
+    + <<async>> UsernameExistsAsync(username:string) : Task<bool>
+    + <<async>> EmailExistsAsync(email:string) : Task<bool>
+    + <<async>> GetAllAsync() : Task<IEnumerable<AdminUserDTO>>
+    + <<async>> DeleteAsync(id:int) : Task
+    + <<async>> UpdateAsync(updateUserDto:UpdateUserDTO) : Task
+    + <<async>> SearchUsersAsync(searchTerm:string, role:string, isActive:bool?) : Task<IEnumerable<AdminUserDTO>>
+}
+IAuthRepository <|-- AuthRepository
+@enduml

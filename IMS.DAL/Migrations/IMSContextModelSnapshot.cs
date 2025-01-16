@@ -24,19 +24,87 @@ namespace IMS.DAL.Migrations
 
             modelBuilder.Entity("IMS.DAL.Entities.Category", b =>
                 {
-                    b.Property<int>("CategoryID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("text");
 
-                    b.HasKey("CategoryID");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryName = "Electronics",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryName = "Office Supplies",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoryName = "Food",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoryName = "Garden Supplies",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoryName = "Cleaning Supplies",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CategoryName = "Electronics",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CategoryName = "Office Supplies",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CategoryName = "Food",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CategoryName = "Garden Supplies",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CategoryName = "Cleaning Supplies",
+                            UserId = 2
+                        });
                 });
 
             modelBuilder.Entity("IMS.DAL.Entities.Item", b =>
@@ -47,10 +115,6 @@ namespace IMS.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ItemID"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -58,21 +122,12 @@ namespace IMS.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ItemName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("MinimumStockQuantity")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -91,56 +146,100 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             ItemID = 1,
-                            Category = "Electronics",
-                            CreatedAt = new DateTime(2025, 1, 8, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(9886),
-                            Description = "Test item with low stock",
-                            ExpiryDate = new DateTime(2025, 1, 14, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(9663),
-                            ItemName = "Low Stock Item",
-                            MinimumStockQuantity = 10,
-                            Price = 10.99m,
-                            StockQuantity = 5,
+                            CreatedAt = new DateTime(2025, 1, 5, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3431),
+                            Description = "Admin item nearing expiry",
+                            Name = "Admin Near Expiry Item 1",
+                            Price = 20.99m,
                             Unit = "pcs",
                             UserId = 1
                         },
                         new
                         {
                             ItemID = 2,
-                            Category = "Office Supplies",
-                            CreatedAt = new DateTime(2025, 1, 9, 0, 14, 40, 304, DateTimeKind.Utc).AddTicks(147),
-                            Description = "Recently added item",
-                            ExpiryDate = new DateTime(2025, 1, 15, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(147),
-                            ItemName = "Near Expiry Item",
-                            MinimumStockQuantity = 5,
-                            Price = 15.99m,
-                            StockQuantity = 20,
+                            CreatedAt = new DateTime(2025, 1, 10, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3671),
+                            Description = "Admin item with low stock",
+                            Name = "Admin Low Stock Item 1",
+                            Price = 5.99m,
                             Unit = "pcs",
-                            UserId = 2
+                            UserId = 1
                         },
                         new
                         {
                             ItemID = 3,
-                            Category = "Food",
-                            CreatedAt = new DateTime(2024, 12, 30, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(153),
-                            Description = "Item near expiry",
-                            ExpiryDate = new DateTime(2025, 1, 15, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(152),
-                            ItemName = "Expiring Item",
-                            MinimumStockQuantity = 5,
-                            Price = 25.99m,
-                            StockQuantity = 15,
+                            CreatedAt = new DateTime(2025, 1, 8, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3674),
+                            Description = "Admin item near expiry and low stock",
+                            Name = "Admin Near Expiry & Low Stock Item",
+                            Price = 15.99m,
                             Unit = "boxes",
                             UserId = 1
                         },
                         new
                         {
                             ItemID = 4,
-                            Category = "Electronics",
-                            CreatedAt = new DateTime(2025, 1, 8, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(155),
-                            Description = "Test item with low stock",
-                            ExpiryDate = new DateTime(2025, 1, 14, 10, 14, 40, 304, DateTimeKind.Utc).AddTicks(154),
-                            ItemName = "Low Stock Item",
-                            MinimumStockQuantity = 10,
-                            Price = 10.99m,
-                            StockQuantity = 5,
+                            CreatedAt = new DateTime(2025, 1, 13, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3675),
+                            Description = "Another admin item nearing expiry",
+                            Name = "Admin Near Expiry Item 2",
+                            Price = 12.99m,
+                            Unit = "pcs",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            ItemID = 5,
+                            CreatedAt = new DateTime(2025, 1, 12, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3677),
+                            Description = "Another admin item with low stock",
+                            Name = "Admin Low Stock Item 2",
+                            Price = 7.99m,
+                            Unit = "pcs",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            ItemID = 6,
+                            CreatedAt = new DateTime(2025, 1, 7, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3789),
+                            Description = "TestUser item nearing expiry",
+                            Name = "TestUser Near Expiry Item 1",
+                            Price = 18.99m,
+                            Unit = "pcs",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            ItemID = 7,
+                            CreatedAt = new DateTime(2025, 1, 9, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3791),
+                            Description = "TestUser item with low stock",
+                            Name = "TestUser Low Stock Item 1",
+                            Price = 9.99m,
+                            Unit = "pcs",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            ItemID = 8,
+                            CreatedAt = new DateTime(2025, 1, 11, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3792),
+                            Description = "TestUser item near expiry and low stock",
+                            Name = "TestUser Near Expiry & Low Stock Item",
+                            Price = 14.99m,
+                            Unit = "boxes",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            ItemID = 9,
+                            CreatedAt = new DateTime(2025, 1, 14, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3793),
+                            Description = "Another TestUser item nearing expiry",
+                            Name = "TestUser Near Expiry Item 2",
+                            Price = 11.99m,
+                            Unit = "pcs",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            ItemID = 10,
+                            CreatedAt = new DateTime(2025, 1, 6, 18, 42, 10, 563, DateTimeKind.Utc).AddTicks(3794),
+                            Description = "Another TestUser item with low stock",
+                            Name = "TestUser Low Stock Item 2",
+                            Price = 8.99m,
                             Unit = "pcs",
                             UserId = 2
                         });
@@ -159,6 +258,58 @@ namespace IMS.DAL.Migrations
                     b.HasIndex("CategoryID");
 
                     b.ToTable("ItemCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            ItemID = 1,
+                            CategoryID = 1
+                        },
+                        new
+                        {
+                            ItemID = 2,
+                            CategoryID = 2
+                        },
+                        new
+                        {
+                            ItemID = 3,
+                            CategoryID = 3
+                        },
+                        new
+                        {
+                            ItemID = 4,
+                            CategoryID = 4
+                        },
+                        new
+                        {
+                            ItemID = 5,
+                            CategoryID = 5
+                        },
+                        new
+                        {
+                            ItemID = 6,
+                            CategoryID = 6
+                        },
+                        new
+                        {
+                            ItemID = 7,
+                            CategoryID = 7
+                        },
+                        new
+                        {
+                            ItemID = 8,
+                            CategoryID = 8
+                        },
+                        new
+                        {
+                            ItemID = 9,
+                            CategoryID = 9
+                        },
+                        new
+                        {
+                            ItemID = 10,
+                            CategoryID = 10
+                        });
                 });
 
             modelBuilder.Entity("IMS.DAL.Entities.Stock", b =>
@@ -172,18 +323,26 @@ namespace IMS.DAL.Migrations
                     b.Property<DateTime>("ArrivalDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ItemID")
                         .HasColumnType("integer");
 
-                    b.Property<int>("QuantityInStock")
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("StockID");
 
                     b.HasIndex("ItemID");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Stocks");
                 });
@@ -230,23 +389,34 @@ namespace IMS.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 1, 9, 10, 14, 40, 209, DateTimeKind.Utc).AddTicks(3114),
+                            CreatedAt = new DateTime(2025, 1, 15, 18, 42, 10, 468, DateTimeKind.Utc).AddTicks(1946),
                             Email = "admin@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$ix.yg.3vijVTTpc4juGG6uo8Z0iF.JJHnrXDmJn7vqkljEgKdlS7W",
+                            PasswordHash = "$2a$11$YOzrIlrUGgBtKNpGOn51L.StP88zt834xrF3LYwebiQPsZYKC2vp2",
                             Role = "Admin",
                             Username = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 1, 9, 10, 14, 40, 303, DateTimeKind.Utc).AddTicks(3223),
+                            CreatedAt = new DateTime(2025, 1, 15, 18, 42, 10, 562, DateTimeKind.Utc).AddTicks(6706),
                             Email = "test@ims.com",
                             IsActive = true,
-                            PasswordHash = "$2a$11$p/a22a.bbCTtM7bzCM867.ilTou4Ty9yFpvoYL53VZsPagHvs.r9m",
+                            PasswordHash = "$2a$11$jrqr3zR/WdxMA8yaxTExy.e5OLPbRmbOpIfNWglSSVLq3YFdrOte.",
                             Role = "User",
                             Username = "testuser"
                         });
+                });
+
+            modelBuilder.Entity("IMS.DAL.Entities.Category", b =>
+                {
+                    b.HasOne("IMS.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IMS.DAL.Entities.Item", b =>
@@ -263,13 +433,13 @@ namespace IMS.DAL.Migrations
             modelBuilder.Entity("IMS.DAL.Entities.ItemCategory", b =>
                 {
                     b.HasOne("IMS.DAL.Entities.Category", "Category")
-                        .WithMany("ItemCategories")
+                        .WithMany("ItemCategory")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IMS.DAL.Entities.Item", "Item")
-                        .WithMany("ItemCategories")
+                        .WithMany("ItemCategory")
                         .HasForeignKey("ItemID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -287,17 +457,25 @@ namespace IMS.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("IMS.DAL.Entities.User", "User")
+                        .WithMany("Stocks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Item");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IMS.DAL.Entities.Category", b =>
                 {
-                    b.Navigation("ItemCategories");
+                    b.Navigation("ItemCategory");
                 });
 
             modelBuilder.Entity("IMS.DAL.Entities.Item", b =>
                 {
-                    b.Navigation("ItemCategories");
+                    b.Navigation("ItemCategory");
 
                     b.Navigation("Stocks");
                 });
@@ -305,6 +483,8 @@ namespace IMS.DAL.Migrations
             modelBuilder.Entity("IMS.DAL.Entities.User", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
         }

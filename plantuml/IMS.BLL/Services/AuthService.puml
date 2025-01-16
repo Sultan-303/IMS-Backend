@@ -1,0 +1,15 @@
+@startuml
+class AuthService {
+    + AuthService(authRepository:IAuthRepository, mapper:IMapper, jwtService:JwtService)
+    + <<async>> RegisterAsync(registerDto:RegisterDTO) : Task<UserDTO>
+    + <<async>> LoginAsync(loginDto:LoginDTO) : Task<string>
+    + <<async>> UpdateUserAsync(id:int, updateDto:UpdateUserDTO) : Task<UserDTO>
+    + <<async>> GetUserByIdAsync(id:int) : Task<UserDTO>
+    + <<async>> GetUserByUsernameAsync(username:string) : Task<UserDTO>
+    + <<async>> GetAllUsersAsync() : Task<IEnumerable<AdminUserDTO>>
+    + <<async>> DeleteUserAsync(id:int) : Task
+    + <<async>> GetAdminDashboardStatsAsync() : Task<AdminDashboardStatsDTO>
+    + <<async>> SearchUsersAsync(searchTerm:string, role:string, isActive:bool?) : Task<IEnumerable<UserDTO>>
+}
+IAuthService <|-- AuthService
+@enduml

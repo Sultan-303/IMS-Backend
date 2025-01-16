@@ -30,7 +30,7 @@ jobs:
           build-args: |
             DATABASE_URL=${{ secrets.AZURE_POSTGRES_CONNECTION_STRING }}
 
-  update-production:
+  Update-Production-Database:
     needs: Build-Docker-Image-And-Push-To-GHCR
     runs-on: ubuntu-latest
     steps:
@@ -46,5 +46,5 @@ jobs:
           dotnet tool restore
       - name: Apply migrations
         env:
-          DATABASE_URL: "Host=ims-postgres-server.postgres.database.azure.com;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True"
+          DATABASE_URL: "${{ secrets.AZURE_POSTGRES_CONNECTION_STRING }}"
         run: dotnet ef database update --project ./IMS.DAL/IMS.DAL.csproj --startup-project ./IMS.API/IMS.API.csproj

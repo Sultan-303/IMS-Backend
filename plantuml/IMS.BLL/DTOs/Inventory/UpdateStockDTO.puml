@@ -1,0 +1,10 @@
+@startuml
+class UpdateStockDTO {
+    + <<required>> Id : int <<get>> <<set>>
+    + <<required>> ItemId : int <<get>> <<set>>
+    + NewQuantity : int? <<get>> <<set>>
+    + UserId : int <<get>> <<set>>
+}
+UpdateStockDTO --> "NewArrivalDate" DateTime
+UpdateStockDTO --> "NewExpiryDate" DateTime
+@enduml

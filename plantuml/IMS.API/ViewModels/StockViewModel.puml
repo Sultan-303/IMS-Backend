@@ -1,0 +1,7 @@
+@startuml
+class StockViewModel {
+    + StockID : int <<get>> <<set>>
+    + ItemID : int <<get>> <<set>>
+    + Quantity : int <<get>> <<set>>
+}
+@enduml

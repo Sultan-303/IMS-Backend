@@ -1,0 +1,11 @@
+@startuml
+class ExceptionMiddleware {
+    + ExceptionMiddleware(next:RequestDelegate, logger:ILogger<ExceptionMiddleware>)
+    + <<async>> InvokeAsync(httpContext:HttpContext) : Task
+}
+class ErrorDetails {
+    + StatusCode : int <<get>> <<set>>
+    + Message : string <<get>> <<set>>
+    + <<override>> ToString() : string
+}
+@enduml

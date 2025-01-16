@@ -1,0 +1,4 @@
+@startuml
+class MigrationName <<partial>> {
+}
+@enduml

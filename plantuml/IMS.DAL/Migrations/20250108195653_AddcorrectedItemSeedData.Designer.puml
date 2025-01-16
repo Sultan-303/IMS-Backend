@@ -1,0 +1,4 @@
+@startuml
+class AddcorrectedItemSeedData <<partial>> {
+}
+@enduml

@@ -28,5 +28,6 @@ namespace IMS.DAL.Entities
 
         // New Property
         public ICollection<Item> Items { get; set; }
+        public ICollection<Stock> Stocks { get; set; } // Added
     }
 }

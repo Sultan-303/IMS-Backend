@@ -1,0 +1,10 @@
+@startuml
+class UpdateItemDTO {
+    + Id : int <<get>> <<set>>
+    + Name : string? <<get>> <<set>>
+    + Unit : string? <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+    + Price : decimal? <<get>> <<set>>
+}
+UpdateItemDTO --> "CreatedAt" DateTime
+@enduml

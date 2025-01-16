@@ -87,15 +87,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Register Services
-builder.Services.AddScoped<ICategoriesService, CategoriesService>();
-builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-builder.Services.AddScoped<IItemService, ItemService>();
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
-builder.Services.AddScoped<IStockService, StockService>();
-builder.Services.AddScoped<IStockRepository, StockRepository>();
-builder.Services.AddScoped<IClientDashboardService, ClientDashboardService>();
-// auth services
+// Register Client Services
+//builder.Services.AddScoped<IClientDashboardService, ClientDashboardService>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+
+// Register Authentication Services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -241,4 +238,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
+
 await app.RunAsync();
+
+public partial class Program { }

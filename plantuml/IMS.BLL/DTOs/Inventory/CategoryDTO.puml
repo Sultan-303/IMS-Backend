@@ -1,0 +1,6 @@
+@startuml
+class CategoryDTO {
+    + Id : int <<get>> <<set>>
+    + CategoryName : string <<get>> <<set>>
+}
+@enduml

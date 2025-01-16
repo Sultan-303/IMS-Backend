@@ -1,0 +1,6 @@
+@startuml
+class CategoryModel {
+    + CategoryID : int <<get>> <<set>>
+    + CategoryName : string <<get>> <<set>>
+}
+@enduml

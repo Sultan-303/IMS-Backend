@@ -1,0 +1,11 @@
+@startuml
+class AdminController {
+    + AdminController(authService:IAuthService)
+    + <<async>> GetAllUsers() : Task<ActionResult<IEnumerable<AdminUserDTO>>>
+    + <<async>> DeleteUser(id:int) : Task<ActionResult>
+    + <<async>> UpdateUser(id:int, updateDto:UpdateUserDTO) : Task<ActionResult<UserDTO>>
+    + <<async>> GetDashboardStats() : Task<ActionResult<AdminDashboardStatsDTO>>
+    + <<async>> SearchUsers(searchTerm:string, role:string, isActive:bool?) : Task<ActionResult<IEnumerable<UserDTO>>>
+}
+ControllerBase <|-- AdminController
+@enduml

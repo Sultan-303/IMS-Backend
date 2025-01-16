@@ -1,0 +1,10 @@
+@startuml
+class UpdateUserDTO {
+    + Id : int <<get>> <<set>>
+    + Username : string? <<get>> <<set>>
+    + Email : string? <<get>> <<set>>
+    + Password : string? <<get>> <<set>>
+    + Role : string? <<get>> <<set>>
+    + IsActive : bool <<get>> <<set>>
+}
+@enduml

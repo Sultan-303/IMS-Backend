@@ -1,0 +1,5 @@
+@startuml
+class UpdateInventoryRepository <<partial>> {
+}
+Migration <|-- UpdateInventoryRepository
+@enduml

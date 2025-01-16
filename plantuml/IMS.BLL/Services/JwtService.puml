@@ -1,0 +1,6 @@
+@startuml
+class JwtService {
+    + JwtService(configuration:IConfiguration)
+    + GenerateToken(userId:int, username:string, role:string) : string
+}
+@enduml

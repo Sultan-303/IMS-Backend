@@ -1,0 +1,8 @@
+@startuml
+class AdminUserDTO {
+    + IsActive : bool <<get>> <<set>>
+}
+UserDTO <|-- AdminUserDTO
+AdminUserDTO --> "CreatedAt" DateTime
+AdminUserDTO --> "LastLogin" DateTime
+@enduml

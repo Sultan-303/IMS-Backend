@@ -1,0 +1,10 @@
+@startuml
+class AdminDashboardStatsDTO {
+    + TotalUsers : int <<get>> <<set>>
+    + ActiveUsers : int <<get>> <<set>>
+    + InactiveUsers : int <<get>> <<set>>
+}
+class "Dictionary`2"<T1,T2> {
+}
+AdminDashboardStatsDTO --> "UsersByRole<string,int>" "Dictionary`2"
+@enduml

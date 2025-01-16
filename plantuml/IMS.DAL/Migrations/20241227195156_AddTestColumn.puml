@@ -1,0 +1,5 @@
+@startuml
+class AddTestColumn <<partial>> {
+}
+Migration <|-- AddTestColumn
+@enduml

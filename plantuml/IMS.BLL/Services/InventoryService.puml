@@ -1,0 +1,19 @@
+@startuml
+class InventoryService {
+    + InventoryService(inventoryRepository:IInventoryRepository)
+    + <<async>> GetUserItemsAsync(userId:int) : Task<IEnumerable<ItemDTO>>
+    + <<async>> AddItemAsync(userId:int, itemDto:ItemDTO) : Task<ItemDTO>
+    + <<async>> UpdateItemAsync(id:int, updateItemDto:UpdateItemDTO) : Task<ItemDTO>
+    + <<async>> DeleteItemAsync(id:int) : Task
+    + <<async>> GetItemStocksAsync(itemId:int) : Task<IEnumerable<StockDTO>>
+    + <<async>> GetUserStocksAsync(userId:int) : Task<IEnumerable<StockDTO>>
+    + <<async>> AddStockAsync(stockDto:StockDTO) : Task<StockDTO>
+    + <<async>> UpdateStockAsync(id:int, updateStockDto:UpdateStockDTO) : Task<StockDTO>
+    + <<async>> DeleteStockAsync(id:int) : Task
+    + <<async>> GetCategoriesByUserIdAsync(userId:int) : Task<IEnumerable<CategoryDTO>>
+    + <<async>> CreateCategoryAsync(userId:int, categoryName:string) : Task<CategoryDTO>
+    + <<async>> AssignCategoryToItemAsync(userId:int, itemId:int, categoryId:int) : Task<bool>
+    + <<async>> AssignNewCategoryToItemAsync(userId:int, itemId:int, categoryName:string) : Task<bool>
+}
+IInventoryService <|-- InventoryService
+@enduml

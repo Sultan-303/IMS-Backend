@@ -1,0 +1,5 @@
+@startuml
+class AddTestUser <<partial>> {
+}
+Migration <|-- AddTestUser
+@enduml

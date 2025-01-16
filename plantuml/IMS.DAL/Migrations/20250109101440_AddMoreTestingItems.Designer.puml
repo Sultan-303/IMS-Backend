@@ -1,0 +1,4 @@
+@startuml
+class AddMoreTestingItems <<partial>> {
+}
+@enduml

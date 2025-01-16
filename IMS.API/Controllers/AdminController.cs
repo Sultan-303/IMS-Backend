@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using IMS.BLL.Interfaces.Services;
 using IMS.BLL.DTOs.Auth;
 using IMS.BLL.DTOs.Admin;
-using AutoMapper;
-
 
 namespace IMS.API.Controllers
 {
@@ -14,12 +12,10 @@ namespace IMS.API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IMapper _mapper;
 
-        public AdminController(IAuthService authService, IMapper mapper)
+        public AdminController(IAuthService authService)
         {
             _authService = authService;
-            _mapper = mapper;
         }
 
         [HttpGet("users")]

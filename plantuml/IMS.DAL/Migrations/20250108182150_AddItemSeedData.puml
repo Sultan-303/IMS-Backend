@@ -1,0 +1,5 @@
+@startuml
+class AddItemSeedData <<partial>> {
+}
+Migration <|-- AddItemSeedData
+@enduml

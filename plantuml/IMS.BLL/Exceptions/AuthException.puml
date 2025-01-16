@@ -1,0 +1,6 @@
+@startuml
+class AuthException {
+    + AuthException(message:string)
+}
+Exception <|-- AuthException
+@enduml

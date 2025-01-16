@@ -1,0 +1,8 @@
+@startuml
+class ItemViewModel {
+    + ItemID : int <<get>> <<set>>
+    + ItemName : string <<get>> <<set>>
+    + Unit : string <<get>> <<set>>
+    + Price : decimal <<get>> <<set>>
+}
+@enduml

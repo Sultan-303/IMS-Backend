@@ -1,0 +1,16 @@
+@startuml
+class Item {
+    + ItemID : int <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+    + Unit : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+    + Price : decimal <<get>> <<set>>
+    + UserId : int <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Item --> "CreatedAt" DateTime
+Item --> "User" User
+Item --> "Stocks<Stock>" "ICollection`1"
+Item --> "ItemCategory<ItemCategory>" "ICollection`1"
+@enduml

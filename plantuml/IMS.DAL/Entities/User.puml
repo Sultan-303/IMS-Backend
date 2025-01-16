@@ -1,0 +1,16 @@
+@startuml
+class User {
+    + Id : int <<get>> <<set>>
+    + Username : string <<get>> <<set>>
+    + Email : string <<get>> <<set>>
+    + PasswordHash : string <<get>> <<set>>
+    + Role : string <<get>> <<set>>
+    + IsActive : bool <<get>> <<set>> = true
+}
+class "ICollection`1"<T> {
+}
+User o-> "CreatedAt" DateTime
+User --> "LastLogin" DateTime
+User --> "Items<Item>" "ICollection`1"
+User --> "Stocks<Stock>" "ICollection`1"
+@enduml

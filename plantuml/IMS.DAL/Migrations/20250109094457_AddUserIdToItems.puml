@@ -1,0 +1,5 @@
+@startuml
+class AddUserIdToItems <<partial>> {
+}
+Migration <|-- AddUserIdToItems
+@enduml

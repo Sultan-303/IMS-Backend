@@ -1,0 +1,19 @@
+@startuml
+class InventoryController {
+    + InventoryController(inventoryService:IInventoryService)
+    + <<async>> GetUserItems() : Task<ActionResult<IEnumerable<ItemDTO>>>
+    + <<async>> AddItem(itemDto:ItemDTO) : Task<ActionResult<ItemDTO>>
+    + <<async>> UpdateItem(id:int, updateItemDto:UpdateItemDTO) : Task<ActionResult<ItemDTO>>
+    + <<async>> DeleteItem(id:int) : Task<IActionResult>
+    + <<async>> GetItemStocks(itemId:int) : Task<ActionResult<IEnumerable<StockDTO>>>
+    + <<async>> GetUserStocks() : Task<ActionResult<IEnumerable<StockDTO>>>
+    + <<async>> AddStock(stockDto:StockDTO) : Task<ActionResult<StockDTO>>
+    + <<async>> UpdateStock(id:int, updateStockDTO:UpdateStockDTO) : Task<ActionResult<StockDTO>>
+    + <<async>> DeleteStock(id:int) : Task<IActionResult>
+    + <<async>> GetCategories() : Task<ActionResult<IEnumerable<CategoryDTO>>>
+    + <<async>> CreateCategory(request:CreateCategoryDTO) : Task<ActionResult<CategoryDTO>>
+    + <<async>> AssignCategoryToItem(itemId:int, categoryId:int) : Task<IActionResult>
+    + <<async>> AssignNewCategoryToItem(itemId:int, categoryName:string) : Task<IActionResult>
+}
+ControllerBase <|-- InventoryController
+@enduml

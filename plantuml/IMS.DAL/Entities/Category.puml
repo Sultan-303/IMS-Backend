@@ -1,0 +1,11 @@
+@startuml
+class Category {
+    + Id : int <<get>> <<set>>
+    + CategoryName : string <<get>> <<set>>
+    + UserId : int <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Category --> "User" User
+Category --> "ItemCategory<ItemCategory>" "ICollection`1"
+@enduml

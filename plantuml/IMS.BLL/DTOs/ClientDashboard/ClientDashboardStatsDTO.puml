@@ -1,0 +1,23 @@
+@startuml
+class ClientDashboardStatsDTO {
+    + LowStockItemsCount : int <<get>> <<set>>
+    + NearExpiryItemsCount : int <<get>> <<set>>
+    + NewItemsCount : int <<get>> <<set>>
+}
+class LowStockItemDTO {
+    + Id : int <<get>> <<set>>
+    + ProductName : string <<get>> <<set>>
+    + CurrentStock : int <<get>> <<set>>
+    + Category : string <<get>> <<set>>
+}
+class NearExpiryItemDTO {
+    + Id : int <<get>> <<set>>
+    + ProductName : string <<get>> <<set>>
+    + Category : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+ClientDashboardStatsDTO --> "LowStockItems<LowStockItemDTO>" "List`1"
+ClientDashboardStatsDTO --> "NearExpiryItems<NearExpiryItemDTO>" "List`1"
+NearExpiryItemDTO --> "ExpiryDate" DateTime
+@enduml

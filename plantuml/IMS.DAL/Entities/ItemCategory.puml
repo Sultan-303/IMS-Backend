@@ -1,0 +1,8 @@
+@startuml
+class ItemCategory {
+    + ItemID : int <<get>> <<set>>
+    + CategoryID : int <<get>> <<set>>
+}
+ItemCategory --> "Item" Item
+ItemCategory --> "Category" Category
+@enduml

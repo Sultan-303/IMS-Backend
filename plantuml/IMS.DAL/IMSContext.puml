@@ -1,0 +1,13 @@
+@startuml
+class IMSContext {
+    + IMSContext(options:DbContextOptions<IMSContext>, configuration:IConfiguration)
+}
+class "DbSet`1"<T> {
+}
+DbContext <|-- IMSContext
+IMSContext --> "Items<Item>" "DbSet`1"
+IMSContext --> "Stocks<Stock>" "DbSet`1"
+IMSContext --> "Categories<Category>" "DbSet`1"
+IMSContext --> "ItemCategories<ItemCategory>" "DbSet`1"
+IMSContext --> "Users<User>" "DbSet`1"
+@enduml

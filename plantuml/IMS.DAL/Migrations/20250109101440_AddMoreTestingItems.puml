@@ -1,0 +1,5 @@
+@startuml
+class AddMoreTestingItems <<partial>> {
+}
+Migration <|-- AddMoreTestingItems
+@enduml

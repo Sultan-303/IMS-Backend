@@ -1,0 +1,6 @@
+@startuml
+class ItemCategoryViewModel {
+    + ItemID : int <<get>> <<set>>
+    + CategoryID : int <<get>> <<set>>
+}
+@enduml

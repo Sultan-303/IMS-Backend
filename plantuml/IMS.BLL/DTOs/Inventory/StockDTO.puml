@@ -1,0 +1,10 @@
+@startuml
+class StockDTO {
+    + StockID : int <<get>> <<set>>
+    + ItemID : int <<get>> <<set>>
+    + Quantity : int <<get>> <<set>>
+    + MinimumStockQuantity : int <<get>> <<set>>
+    + UserId : int <<get>> <<set>>
+}
+StockDTO --> "ExpiryDate" DateTime
+@enduml

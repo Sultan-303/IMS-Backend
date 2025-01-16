@@ -1,0 +1,6 @@
+@startuml
+class AutoMapperProfile {
+    + AutoMapperProfile()
+}
+Profile <|-- AutoMapperProfile
+@enduml

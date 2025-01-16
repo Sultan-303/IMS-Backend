@@ -1,0 +1,5 @@
+@startuml
+class UpdateItemandStock <<partial>> {
+}
+Migration <|-- UpdateItemandStock
+@enduml

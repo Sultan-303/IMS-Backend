@@ -1,0 +1,5 @@
+@startuml
+class AddItemDescription <<partial>> {
+}
+Migration <|-- AddItemDescription
+@enduml
