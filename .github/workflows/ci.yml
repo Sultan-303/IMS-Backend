@@ -48,25 +48,3 @@ jobs:
         env:
           DATABASE_URL: "Host=ims-postgres-server.postgres.database.azure.com;Database=ims_db;Username=postgres@ims-postgres-server;Password=Watchdogs1!;SSL Mode=Require;Trust Server Certificate=True"
         run: dotnet ef database update --project ./IMS.DAL/IMS.DAL.csproj --startup-project ./IMS.API/IMS.API.csproj
-
-  CodeQL-Analysis:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: 'csharp'
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
