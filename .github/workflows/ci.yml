@@ -48,3 +48,13 @@ jobs:
         env:
           DATABASE_URL: "${{ secrets.AZURE_POSTGRES_CONNECTION_STRING }}"
         run: dotnet ef database update --project ./IMS.DAL/IMS.DAL.csproj --startup-project ./IMS.API/IMS.API.csproj
+
+  SonarQube-Scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: SonarQube Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
