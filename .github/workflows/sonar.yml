@@ -1,43 +1,61 @@
-name: Build
+name: SonarQube Analysis
+
 on:
   push:
-    branches: ['**'] # the name of your main branch
+    branches: ['**']
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
 jobs:
-  build:
-    name: Build
+  sonarcloud:
+    name: SonarQube Scan
     runs-on: windows-latest
+
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 1.17
+          java-version: '17'
+
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Disable shallow clones for better analysis
+
       - name: Cache SonarQube packages
         uses: actions/cache@v1
         with:
-          path: ~\.sonar\cache
+          path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache SonarQube scanner
         id: cache-sonar-scanner
         uses: actions/cache@v1
         with:
-          path: .\.sonar\scanner
+          path: ~/.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
+
       - name: Install SonarQube scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Build and analyze
-        shell: powershell
+          New-Item -Path ~/.sonar/scanner -ItemType Directory -Force
+          dotnet tool install --global dotnet-sonarscanner --version 5.3.1
+          $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
+
+      - name: SonarQube Scan Begin
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"example" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
-          dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner begin /k:"example" /o:"${{ secrets.SONAR_ORGANIZATION }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+        shell: powershell
+
+      - name: Build Solution
+        run: |
+          dotnet build IMS.Backend.sln --no-restore
+        shell: powershell
+
+      - name: SonarQube Scan End
+        run: |
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+        shell: powershell

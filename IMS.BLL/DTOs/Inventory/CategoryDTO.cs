@@ -9,5 +9,6 @@ namespace IMS.BLL.DTOs.Inventory
         [Required]
         [StringLength(100)]
         public string CategoryName { get; set; }
+        public int UserId { get; set; } // Added UserId property
     }
 }
