@@ -11,6 +11,7 @@ namespace IMS.BLL.Interfaces.Repositories
         Task<ItemDTO> AddItemAsync(int userId, ItemDTO itemDto);
         Task<ItemDTO> UpdateItemAsync(int id, UpdateItemDTO updateItemDto);
         Task DeleteItemAsync(int id);
+        Task<ItemDTO> GetItemByIdAsync(int itemId);
 
         // Stock-related methods
         Task<IEnumerable<StockDTO>> GetStocksByItemIdAsync(int itemId);

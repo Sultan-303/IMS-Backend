@@ -30,6 +30,15 @@ namespace IMS.DAL.Repositories
             return _mapper.Map<IEnumerable<ItemDTO>>(items);
         }
 
+        public async Task<ItemDTO> GetItemByIdAsync(int itemId)
+        {
+            var item = await _context.Items.FindAsync(itemId);
+            if (item == null)
+                return null;
+
+            return _mapper.Map<ItemDTO>(item);
+        }
+
         public async Task<ItemDTO> AddItemAsync(int userId, ItemDTO itemDto)
         {
             var item = _mapper.Map<Item>(itemDto);

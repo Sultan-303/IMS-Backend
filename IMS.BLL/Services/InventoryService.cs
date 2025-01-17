@@ -36,6 +36,23 @@ namespace IMS.BLL.Services
             await _inventoryRepository.DeleteItemAsync(id);
         }
 
+        public async Task CheckAndReorderStockAsync(int itemId, int reorderThreshold, int reorderQuantity)
+        {
+            var item = await _inventoryRepository.GetItemByIdAsync(itemId);
+            if (item == null)
+                throw new InvalidOperationException($"Item with ID {itemId} not found");
+
+            if (item.Stock < reorderThreshold)
+            {
+                item.Stock += reorderQuantity;
+                await _inventoryRepository.UpdateItemAsync(itemId, new UpdateItemDTO
+                {
+                    Id = itemId,
+                    Stock = item.Stock
+                });
+            }
+        }
+
         // Stock-related methods
         public async Task<IEnumerable<StockDTO>> GetItemStocksAsync(int itemId)
         {

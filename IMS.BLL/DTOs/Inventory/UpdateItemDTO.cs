@@ -19,5 +19,7 @@ namespace IMS.BLL.DTOs.Inventory
         public decimal? Price { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+
+        public int Stock { get; set; }
     }
 }
