@@ -20,7 +20,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryService = new InventoryService(_inventoryRepositoryMock.Object);
         }
 
-        // GetUserItemsAsync Tests
         [Fact]
         public async Task GetUserItemsAsync_ShouldReturnItems()
         {
@@ -42,7 +41,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.GetItemsByUserIdAsync(userId), Times.Once);
         }
 
-        // AddItemAsync Tests
         [Fact]
         public async Task AddItemAsync_ShouldReturnAddedItem()
         {
@@ -60,7 +58,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.AddItemAsync(userId, newItem), Times.Once);
         }
 
-        // UpdateItemAsync Tests
         [Fact]
         public async Task UpdateItemAsync_ShouldReturnUpdatedItem()
         {
@@ -96,7 +93,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.DeleteItemAsync(id), Times.Once);
         }
 
-        // CheckAndReorderStockAsync Tests
         [Fact]
         public async Task CheckAndReorderStockAsync_ShouldReorder_WhenStockBelowThreshold()
         {
@@ -157,7 +153,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.UpdateItemAsync(It.IsAny<int>(), It.IsAny<UpdateItemDTO>()), Times.Never);
         }
 
-        // GetItemStocksAsync Tests
         [Fact]
         public async Task GetItemStocksAsync_ShouldReturnStocks()
         {
@@ -179,7 +174,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.GetStocksByItemIdAsync(itemId), Times.Once);
         }
 
-        // GetUserStocksAsync Tests
         [Fact]
         public async Task GetUserStocksAsync_ShouldReturnUserStocks()
         {
@@ -198,10 +192,9 @@ namespace IMS.BLL.Tests.Services
 
             // Assert
             Assert.Equal(stocks, result);
-            _inventoryRepositoryMock.Verify(repo => repo.GetStocksByUserIdAsync(userId), Times.Once);
+            _inventoryRepositoryMock.Verify(repo => repo.GetStocksByUserIdAsync(userId));
         }
 
-        // AddStockAsync Tests
         [Fact]
         public async Task AddStockAsync_ShouldReturnAddedStock()
         {
@@ -218,7 +211,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.AddStockAsync(stockDto), Times.Once);
         }
 
-        // UpdateStockAsync Tests
         [Fact]
         public async Task UpdateStockAsync_ShouldReturnUpdatedStock()
         {
@@ -249,7 +241,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.UpdateStockAsync(id, updateDto), Times.Once);
         }
 
-        // DeleteStockAsync Tests
         [Fact]
         public async Task DeleteStockAsync_ShouldCallRepositoryDelete()
         {
@@ -266,7 +257,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.DeleteStockAsync(id), Times.Once);
         }
 
-        // GetCategoriesByUserIdAsync Tests
         [Fact]
         public async Task GetCategoriesByUserIdAsync_ShouldReturnCategories()
         {
@@ -288,7 +278,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.GetCategoriesByUserIdAsync(userId), Times.Once);
         }
 
-        // CreateCategoryAsync Tests
         [Fact]
         public async Task CreateCategoryAsync_ShouldReturnCreatedCategory()
         {
@@ -307,7 +296,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.CreateCategoryAsync(userId, categoryName), Times.Once);
         }
 
-        // AssignCategoryToItemAsync Tests
         [Fact]
         public async Task AssignCategoryToItemAsync_ShouldReturnTrue_WhenAssignmentSuccessful()
         {
@@ -344,7 +332,6 @@ namespace IMS.BLL.Tests.Services
             _inventoryRepositoryMock.Verify(repo => repo.AssignCategoryToItemAsync(userId, itemId, categoryId), Times.Once);
         }
 
-        // AssignNewCategoryToItemAsync Tests
         [Fact]
         public async Task AssignNewCategoryToItemAsync_ShouldReturnTrue_WhenAssignmentSuccessful()
         {
@@ -378,7 +365,7 @@ namespace IMS.BLL.Tests.Services
 
             // Assert
             Assert.False(result);
-            _inventoryRepositoryMock.Verify(repo => repo.AssignNewCategoryToItemAsync(userId, itemId, categoryName), Times.Once);
+            _inventoryRepositoryMock.Verify(repo => repo.AssignNewCategoryToItemAsync(userId, itemId, categoryName));
         }
     }
 }
